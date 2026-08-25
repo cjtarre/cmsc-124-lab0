@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#run
+exec dotnet build/Cmsc124Lab0CSharp.dll "$@"
