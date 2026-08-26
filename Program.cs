@@ -1,1 +1,1 @@
-﻿Console.WriteLine("HAMPAS Earth KA!");
+﻿Console.WriteLine("good bye mars");
