@@ -1,0 +1,15 @@
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\obj\Release\net10.0\YOUR_PROJECT_NAME.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\obj\Release\net10.0\YOUR_PROJECT_NAME.AssemblyInfoInputs.cache
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\obj\Release\net10.0\YOUR_PROJECT_NAME.AssemblyInfo.cs
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\obj\Release\net10.0\YOUR_PROJECT_NAME.csproj.CoreCompileInputs.cache
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\obj\Release\net10.0\YOUR_PROJECT_NAME.sourcelink.json
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\bin\Release\net10.0\YOUR_PROJECT_NAME.exe
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\bin\Release\net10.0\YOUR_PROJECT_NAME.deps.json
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\bin\Release\net10.0\YOUR_PROJECT_NAME.runtimeconfig.json
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\bin\Release\net10.0\YOUR_PROJECT_NAME.dll
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\bin\Release\net10.0\YOUR_PROJECT_NAME.pdb
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\obj\Release\net10.0\YOUR_PROJECT_NAME.dll
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\obj\Release\net10.0\refint\YOUR_PROJECT_NAME.dll
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\obj\Release\net10.0\YOUR_PROJECT_NAME.pdb
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\obj\Release\net10.0\YOUR_PROJECT_NAME.genruntimeconfig.cache
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\obj\Release\net10.0\ref\YOUR_PROJECT_NAME.dll

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# run
+exec dotnet build/YOUR_PROJECT_NAME.dll "$@"

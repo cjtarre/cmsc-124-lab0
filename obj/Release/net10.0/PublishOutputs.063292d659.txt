@@ -1,0 +1,5 @@
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\build\YOUR_PROJECT_NAME.exe
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\build\YOUR_PROJECT_NAME.dll
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\build\YOUR_PROJECT_NAME.deps.json
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\build\YOUR_PROJECT_NAME.runtimeconfig.json
+C:\Users\Gabrielle\Repos\cmsc-124-lab0\build\YOUR_PROJECT_NAME.pdb
