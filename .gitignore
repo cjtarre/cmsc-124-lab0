@@ -1,0 +1,7 @@
+/bin/
+/obj/
+/build/
+/.vs/
+/.vscode/
+*.user
+/run_tests.py
