@@ -1,0 +1,5 @@
+IF x < 10 THEN
+    PRINT x
+ELSE IF x > 10
+    PRINT y
+END IF
