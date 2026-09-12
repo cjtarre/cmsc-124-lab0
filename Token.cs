@@ -15,6 +15,12 @@ public class Token
 
     public override string ToString()
     {
-        return $"Token(type={Type}, lexeme={Lexeme}, literal={Literal ?? "null"}, line={Line})";
+        return $"Token(type={Type}, lexeme={Lexeme}, literal={Literal switch
+        {
+            null => "null",
+            double number => number.ToString("0.0"),
+            bool boolean => boolean.ToString().ToLowerInvariant(),
+            _ => Literal.ToString()
+        }}, line={Line})";
     }
 }

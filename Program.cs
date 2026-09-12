@@ -35,7 +35,28 @@ else
 try
 {
     Console.OutputEncoding = Encoding.UTF8;
-    Console.Write(File.ReadAllText(path, Encoding.UTF8));
+
+    string source = File.ReadAllText(path, Encoding.UTF8);
+
+    if (args[0] == "--tokenize")
+    {
+        Scanner scanner = new Scanner(source);
+        List<Token> tokens = scanner.ScanTokens();
+
+        if (scanner.HadError)
+        {
+            return 65;
+        }
+
+        foreach (Token token in tokens)
+        {
+            Console.WriteLine(token);
+        }
+
+        return 0;
+    }
+
+    Console.Write(source);
     return 0;
 }
 catch (Exception error) when (error is IOException or UnauthorizedAccessException)
