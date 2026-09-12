@@ -2,16 +2,35 @@
 
 static int Fail(string message)
 {
-    Console.Error.WriteLine($"lab0: {message}");
+    Console.Error.WriteLine($"SudoCode: {message}");
     return 65;
 }
 
 if (args.Length == 0)
 {
-    return Fail("expected one source-file path");
+    return Fail("expected a source-file path or --tokenize <source-file>");
 }
 
-var path = args[0];
+string path;
+
+if (args[0] == "--tokenize")
+{
+    if (args.Length != 2)
+    {
+        return Fail("expected --tokenize <source-file>");
+    }
+
+    path = args[1];
+}
+else
+{
+    if (args.Length != 1)
+    {
+        return Fail("expected a source-file path");
+    }
+
+    path = args[0];
+}
 
 try
 {
