@@ -44,6 +44,7 @@ public enum TokenType
     EACH,
     IN,
     TO,
+    STEP,
     DO,
     REPEAT,
     UNTIL,
