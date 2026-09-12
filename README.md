@@ -47,14 +47,15 @@ INPUT OUTPUT
 
 END
 IF THEN ELSE
-FOR TO
+FOR EACH IN TO
 WHILE DO
 REPEAT UNTIL
-CASE OF
+CASE OF COLON DEFAULT
 
 CALL RETURN
 FUNCTION PROCEDURE
 
+AND OR NOT XOR
 TRUE FALSE NIL
 ```
 
@@ -83,13 +84,17 @@ TRUE FALSE NIL
 | `THEN` | Executes the succeeding instructions when associated `IF` evaluates `true`.   |
 | `ELSE` | Executes the alternative instructions when associated `IF` evaluates `false`. <br> Can be combined with another `IF` to specify additional conditions. |
 | `FOR` | Represents a loop that repeats a block of code a specific number of times. |
+| `EACH` | Used in conjunction with `FOR` to specify iteration over every element in a collection (e.g., `FOR EACH item IN array DO`). |
+| `IN` | Delimiter keyword specifying the collection or range being iterated through inside a loop. |
 | `TO` | Used inside a `FOR` loop to specify the upper boundary limit <br>(e.g., `FOR i = 1 TO 10`). |
+| `STEP` | Specifies the increment or decrement value in a `FOR` loop <br>(e.g., `FOR i <- 1 TO 10 STEP 2`). |
 | `WHILE` | Represents a loop that continues to execute as long as a condition is true. |
 | `DO` | Delimiter keyword that opens the execution body of a `WHILE` or `FOR` loop |
 | `REPEAT` | Represents a loop that continues to execute until the specified condition is true. |
 | `UNTIL` | Used with `REPEAT` or `DO`, specifies the condition for the loop to stop. |
 | `CASE` | Used to select one of many blocks of code to execute. |
 | `OF` | Used in conjunction with `CASE` to define possible values. |
+| `DEFAULT` | Act as the fallback execution choice if no `WHEN` blocks match inside a `CASE` statement. |
 
 #### Functions and Procedures
 | Keyword | Purpose |
@@ -106,7 +111,7 @@ TRUE FALSE NIL
 | `+`, `-` | arithmetic | binary | left | 4 |
 | `=`, `>`, `>=`, `<`, `<=`, `!=` | comparison | binary | left | 3 |
 | `NOT` | logical | unary | right | 2 |
-| `AND`, `OR` | logical | binary | left | 1 |
+| `AND`, `OR`, `XOR` | logical | binary | left | 1 |
 | `<-` | assignment | binary | right | 0 (*loosest*) |
 
 ### Identifiers
@@ -130,15 +135,15 @@ TRUE FALSE NIL
 - Statement terminator: **None**. Code steps are separated implicitly by statement block sequences and structural boundary wrappers. Newlines are handled as standard whitespace.
 - Block delimiters: **Marked explicitly** by corresponding keyword bounds <br>(e.g., `IF` ... `THEN` ... `END IF` or `WHILE` ... `DO` ... `END WHILE`).
 - Grouping delimiters: Standard parentheses `(` and `)` are used to force expression precedence and enclose function/procedure parameters.
-- Token separators: Commas `,` are used to separate parameters in function definitions and arguments in call statements.
+- Token separators: Commas `,` are used to separate parameters in function definitions, and colons `:` are used to mark individual branch blocks inside conditional `CASE` statements.
 
 ## Token output format
 ```
-Token(type=INITIALIZE, lexeme="INITIALIZE", literal=null, line=1)
+Token(type=VAR, lexeme="INITIALIZE", literal=null, line=1)
 Token(type=IDENTIFIER, lexeme="counter", literal=null, line=1)
 Token(type=EQUAL, lexeme="<-", literal=null, line=1)
-Token(type=NUMBER, lexeme="10", literal=10, line=1)
-Token(type=EOF, lexeme"=," literal=null, line=1)
+Token(type=NUMBER, lexeme="10", literal=10.0, line=1)
+Token(type=EOF, lexeme="", literal=null, line=1)
 ```
 - `type`: The internal enum categorization of the matched string token.
 - `lexeme`: The literal exact substring sequence sliced directly from the `.sudo` raw file.
@@ -146,7 +151,7 @@ Token(type=EOF, lexeme"=," literal=null, line=1)
 - `line`: The tracker value pointing to the line number the token was detected on.
 
 ## Grammar
-*To be defined in Lab 2 (Parser).*
+*To be defined in a later lab activity.*
 ```
 [CFG table.]
 ```
@@ -241,7 +246,7 @@ python3 run_tests.py tests/lab1
 ## Sample code
 ```text
 INITIALIZE counter <- 1
-FOR i <- 1 TO 5 DO
+FOR i IN 1 TO 5 DO
     IF i MOD 2 = 0 THEN
         PRINT i
         SET counter <- counter + 1
@@ -249,7 +254,6 @@ FOR i <- 1 TO 5 DO
 END FOR
 ```
 
-Output:
 Output:
 ```text
 2
@@ -259,7 +263,7 @@ Output:
 ## Design rationale
 `SudoCode` was intentionally designed to capture the structural clarity of classic academic pseudocode while eliminating C-style syntax clutter. We explicitly decoupled our keywords to follow simple, clean, individual token blocks (such as processing `END` and `IF` as separate tokens rather than a single compound lexeme), allowing our upcoming parser rules to safely establish scope logic. We chose to separate declaration (`INITIALIZE`) from mutation (`SET`) to enforce absolute clarity when reading state transformations. 
 
-Our most significant mid-design pivot was removing the dual assignment meaning of the `TO` keyword. Originally conceptualized for assignments (e.g., `SET x TO 5`), this created a parsing ambiguity with traditional `FOR i = 1 TO 10` iteration limits. We resolved this conflict by adopting the universal pseudocode assignment arrow (`<-`) and reserving `TO` strictly for loop boundaries. We also opted out of using standard brackets or curly braces, leaning entirely into matching text boundaries (like `IF` paired with `END IF`) to keep program code clean, flowing, and readable.
+Our most significant mid-design pivot was removing the dual assignment meaning of the `TO` keyword. Originally conceptualized for assignments (e.g., `SET x TO 5`), this created a parsing ambiguity with traditional `FOR i IN 1 TO 10` iteration limits. We resolved this conflict by adopting the universal pseudocode assignment arrow (`<-`) and reserving `TO` strictly for loop boundaries. We also opted out of using standard brackets or curly braces, leaning entirely into matching text boundaries (like `IF` paired with `END IF`) to keep program code clean, flowing, and readable.
 
 ## Known limitations
 - Standard multi-line block commenting structures are completely unsupported; documentation annotations are restricted strictly to single-line `>>` prefixes.
