@@ -1,6 +1,272 @@
-# [CMSC 124 Lab] Lab 0 - Sumergido, GM & Tarre, CJ
-GitHub Repository for Lab 0 - Onboarding
+# `SudoCode`
 
-### Members:
-- Sumergido, GM
-- Tarre, CJ
+## Creators
+- Gabrielle Sumergido ([`freshlybakedsnep`](https://github.com/freshlybakedsnep))
+- Ma. Christie Jude Tarre ([`cjtarre`](https://github.com/cjtarre))
+
+## Overview
+`SudoCode` is a simplified dynamically-typed language that helps programmers visualize algorithm behavior without being constrained by rigid syntactic overhead. It features a natural-language layout and a loosely structured design that mirrors classic academic pseudocode conventions. Writing in `SudoCode` should feel like drafting a flowchart or a textbook algorithm directly into an executable text file, allowing developers to focus entirely on core computational logic and sequence design rather than bracket tracking and typing safety. 
+
+## Host language and build
+- Host language: C# (.NET 8.0)
+- Version metadata: [file that pins it, e.g. rust-toolchain.toml, go.mod]
+- Build: `./build.sh`
+- A fresh clone requires the host machine to have the .NET 8.0 SDK (or later) installed. Running `./build.sh` triggers `dotnet build --configuration` Release.
+
+## Running it
+| Command | What it does |
+|---|---|
+| `./run <file>` | [Executes a program. Available from Lab 4.] |
+| `./run --tokenize <file>` | Prints the token stream to standard output. |
+| `./run --parse <file>` | Prints the parsed tree. |
+| `./run --eval <file>` | [Evaluates each expression and prints its value.] |
+| `./run` | [Starts the REPL.] |
+
+Exit codes: 
+- `0`: When a program runs or tokenizes completely without any lexical, syntactic, or execution failures. 
+- `65`: When a static error is encountered (such as a lexical flaw or invalid character during tokenization).
+- `70`: When a runtime exception is thrown during evaluation.
+
+## File extension
+`.sudo` - a stylized abbreviation of the word Pseudo.
+
+## Lexical structure
+### Keywords
+All keywords in this language are defined and written in uppercase.
+
+### Master Token Registry
+```
+LEFT_PAREN RIGHT_PAREN 
+PLUS MINUS STAR SLASH EQUAL 
+EQUAL_EQUAL BANG BANG_EQUAL LESS LESS_EQUAL GREATER GREATER_EQUAL 
+VAR IDENTIFIER STRING NUMBER 
+EOF
+
+SET INITIALIZE
+INPUT OUTPUT
+
+END
+IF THEN ELSE
+FOR TO
+WHILE DO
+REPEAT UNTIL
+CASE OF
+
+CALL RETURN
+FUNCTION PROCEDURE
+
+TRUE FALSE NIL
+```
+
+### Literals
+| Kind | Syntax | Produces |
+|---|---|---|
+| `IDENTIFIER` | *See* [`Identifiers`](#identifiers) | A bound reference name to a stored variable context |
+| `NUMBER` | Digits with optional single dot fractional notation (e.g., `42`, `3.14`) | IEEE 754 double-precision floating-point runtime values |
+| `STRING` | Characters wrapped inside matching double quotation marks (e.g., `"hello"`) | UTF-16 character string runtime values |
+| `BOOLEAN` | Case-sensitive Boolean keywords: `TRUE`, `FALSE` | Logic bit values (`true` / `false`) |
+| `NIL` | The explicit empty value keyword `NIL` | Null pointer baseline references |
+
+#### Data Handling
+| Keyword | Purpose |
+|---|---|
+| `INPUT` | Used to receive input from the user or another source. |
+| `OUTPUT` `PRINT` | Used to display output to the user. |
+| `INITIALIZE` | Sets up variables or data structures with initial values using `<-`. |
+| `SET` | Used to assign a value to a variable using `<-`. |
+
+#### Control Structures
+| Keyword | Purpose |
+|---|---|
+| `END` | Marks the end of a code block, used in conjunction with another keyword. <br>Valid keywords: `END IF`,  `END FOR`, `END WHILE`, `END CASE`, `END FUNCTION`, `END PROCEDURE` |
+| `IF` | Used to specify a condition. Evaluates as `TRUE` or `FALSE`. |
+| `THEN` | Executes the succeeding instructions when associated `IF` evaluates `true`.   |
+| `ELSE` | Executes the alternative instructions when associated `IF` evaluates `false`. <br> Can be combined with another `IF` to specify additional conditions. |
+| `FOR` | Represents a loop that repeats a block of code a specific number of times. |
+| `TO` | Used inside a `FOR` loop to specify the upper boundary limit <br>(e.g., `FOR i = 1 TO 10`). |
+| `WHILE` | Represents a loop that continues to execute as long as a condition is true. |
+| `DO` | Delimiter keyword that opens the execution body of a `WHILE` or `FOR` loop |
+| `REPEAT` | Represents a loop that continues to execute until the specified condition is true. |
+| `UNTIL` | Used with `REPEAT` or `DO`, specifies the condition for the loop to stop. |
+| `CASE` | Used to select one of many blocks of code to execute. |
+| `OF` | Used in conjunction with `CASE` to define possible values. |
+
+#### Functions and Procedures
+| Keyword | Purpose |
+|---|---|
+| `FUNCTION` | Defines a function that returns a value. |
+| `PROCEDURE` | Defines a function that does not return a value. |
+| `CALL` | Executes a function or procedure. |
+| `RETURN` | Specifies the value to return from a function.  |
+
+### Operators
+| Operator | Category | Operands | Associativity | Precedence |
+|---|---|---|---|---|
+| `*`, `/`, `MOD` | arithmetic | binary | left | 5 (*tightest*) |
+| `+`, `-` | arithmetic | binary | left | 4 |
+| `=`, `>`, `>=`, `<`, `<=`, `!=` | comparison | binary | left | 3 |
+| `NOT` | logical | unary | right | 2 |
+| `AND`, `OR` | logical | binary | left | 1 |
+| `<-` | assignment | binary | right | 0 (*loosest*) |
+
+### Identifiers
+- Start characters: Letters `a-z`, `A-Z`, or an underscore `_`
+- Continue characters: Letters `a-z`, `A-Z`, numbers `0-9` or an underscore `_`
+- Case-sensitive: **Yes**.
+- Compound instructions like `END IF` or `ELSE IF` are scanned as independent tokens (`END` followed by `IF`) and handled at the grammar phase. 
+- Variable names cannot perfectly match any singular keyword identifier list.
+- String Boundaries: String literals must begin and end with explicit double quotes (`"`). Direct use of single quotes (`'`) are not recognized and will throw a lexical error.
+- Multi-line Strings: String literals cannot span multiple lines. Hitting a newline character `\n` before finding the closing double quote will immediately terminate scanning and trigger an `Unterminated String` static error (Exit Code `65`).
+- Escape Characters: `SudoCode` strings do not process backslash escape sequences (like `\n` or `\t`) within text literals. A backslash is treated as a literal text character.
+
+### Comments
+- Line comments: `>>`
+- Block comments: Not supported
+- Nesting: Not supported
+- Harness note: `comment_prefix` in `tests/lab*/manifest.json` is set to "`>>`".
+
+## Whitespace and termination
+- Whitespace significant: **No**. Whitespace acts as a delimiter to distinguish individual words and symbols but does not dictate program structural grouping or indent validation.
+- Statement terminator: **None**. Code steps are separated implicitly by statement block sequences and structural boundary wrappers. Newlines are handled as standard whitespace.
+- Block delimiters: **Marked explicitly** by corresponding keyword bounds <br>(e.g., `IF` ... `THEN` ... `END IF` or `WHILE` ... `DO` ... `END WHILE`).
+- Grouping delimiters: Standard parentheses `(` and `)` are used to force expression precedence and enclose function/procedure parameters.
+- Token separators: Commas `,` are used to separate parameters in function definitions and arguments in call statements.
+
+## Token output format
+```
+Token(type=INITIALIZE, lexeme="INITIALIZE", literal=null, line=1)
+Token(type=IDENTIFIER, lexeme="counter", literal=null, line=1)
+Token(type=EQUAL, lexeme="<-", literal=null, line=1)
+Token(type=NUMBER, lexeme="10", literal=10, line=1)
+Token(type=EOF, lexeme"=," literal=null, line=1)
+```
+- `type`: The internal enum categorization of the matched string token.
+- `lexeme`: The literal exact substring sequence sliced directly from the `.sudo` raw file.
+- `literal`: The interpreted object primitive representation (unboxed strings, parsed double precision values, or `null`).
+- `line`: The tracker value pointing to the line number the token was detected on.
+
+## Grammar
+*To be defined in Lab 2 (Parser).*
+```
+[CFG table.]
+```
+
+## Parse output format
+*To be defined in a later lab activity.*
+```
+[Sample console code.]
+```
+
+## Semantics
+*To be defined in a later lab activity.*
+### Values and types
+`SudoCode` supports four core runtime data primitive types managed dynamically in the host architecture:
+- **Numbers**: Represented inside the host engine environment as native C# `double` precision variables for dynamic typing compatibility.
+- **Strings**: Stored and tracked as native .NET `string` objects.
+- **Booleans**: Represented via native C# `bool` flags (`true` and `false`).
+- **Nil**: Represents an empty or uninitialized state, mapped straight to a native C# `null` reference value.
+
+### Value printing
+- Numbers: Prints without trailing decimals if it is an integer representation (e.g., `5`), or with explicit fractional scales if a true floating-point value is maintained (e.g., `5.25`).
+- Nil: Prints explicitly as the lowercase textual literal `nil`.
+- Strings: Extracted and printed directly to standard output without surrounding quotation marks.
+
+### Truthiness
+`SudoCode` follows a strict truthiness evaluation rule:
+- Only the Boolean flag value `FALSE` and the empty object state `NIL` are interpreted as falsy conditions.
+- Every other initialized value type, object, number, or non-empty string is resolved as **true**.
+
+### Operator semantics
+- Arithmetic: Requires both matching operands to be `NUMBER` types. Any alternative configuration throws a static error.
+- `+` on strings: Performs string concatenation if either operand evaluates as a string literal (e.g., `"Value: " + 5` produces `"Value: 5"`).
+- Mixed types: Triggers an operational type-mismatch error unless evaluated by string concatenation setups.
+- Comparison: Allowed exclusively between numerical items.
+- Equality across types: Comparing different types (e.g., matching a string to a number) resolves directly as `false` safely without triggering a system crash.
+- Division by zero: Throws a runtime evaluation error with exit code `70`.
+
+### Scope and bindings
+- Redeclaration in the same scope: Attempting to `INITIALIZE` a variable that already exists in the same scope causes a static analysis error exiting under code `65`.
+- Uninitialized variable holds: Cannot occur. Variables must explicitly pass through an `INITIALIZE` binding sequence, unless it is a counter variable such as in `FOR`.
+- Shadowing: Inner local block levels fully shadow broader identifier declarations safely.
+- Undefined name: Referencing unmapped variable names causes a static validation crash exiting with code `65`.
+
+### Control flow and functions
+- Logical operators return: The specific logical evaluated `bool` answer (`TRUE` or `FALSE`).
+- Dangling else binds to: The nearest nested, unresolved, open `IF` statement block.
+- Closure capture of a loop variable: Shared reference capture behavior across execution paths.
+- Function with no return statement produces: A standard default state tracking value of `NIL`.
+- Arity mismatch: Passing the wrong number of arguments to a function throws a static signature mismatch error exiting under code `65`. 
+
+## Native functions
+*To be defined in a later lab activity.*
+| Name | Arguments | Returns | Notes |
+|---|---|---|---|
+| [name] | [count and types] | [type] | [caveats] |
+
+## Errors and diagnostics
+Message format:
+
+```text
+[Line 3] Lexical Error: Unexpected character '@' found in scan block.
+[Line 5] Runtime Error: Division by zero is undefined.
+```
+
+| Failure | Exit code |
+|---|---|
+| lexical error | `65` |
+| syntax error | `65` |
+| runtime error | `70` |
+
+
+## Testing conventions
+| Folder | Activity | Mode | Flag |
+|---|---|---|---|
+| tests/lab1 | Scanner | sidecar | `--tokenize` |
+| tests/lab2 | Parser | sidecar | `--parse` |
+| tests/lab3 | Evaluator | inline | `--eval` |
+| tests/lab4 | Context | inline | none |
+| tests/lab5 | Functions | inline | none |
+
+```
+[specific tests]...
+```
+
+Run locally with:
+```bash
+curl -sSL https://raw.githubusercontent.com/WhiteLicorice/cmsc-124-harness/v1.1/run_tests.py -o run_tests.py
+./build.sh
+python3 run_tests.py tests/lab1
+```
+
+## Sample code
+```text
+INITIALIZE counter <- 1
+FOR i <- 1 TO 5 DO
+    IF i MOD 2 = 0 THEN
+        PRINT i
+        SET counter <- counter + 1
+    END IF
+END FOR
+```
+
+Output:
+Output:
+```text
+2
+4
+```
+
+## Design rationale
+`SudoCode` was intentionally designed to capture the structural clarity of classic academic pseudocode while eliminating C-style syntax clutter. We explicitly decoupled our keywords to follow simple, clean, individual token blocks (such as processing `END` and `IF` as separate tokens rather than a single compound lexeme), allowing our upcoming parser rules to safely establish scope logic. We chose to separate declaration (`INITIALIZE`) from mutation (`SET`) to enforce absolute clarity when reading state transformations. 
+
+Our most significant mid-design pivot was removing the dual assignment meaning of the `TO` keyword. Originally conceptualized for assignments (e.g., `SET x TO 5`), this created a parsing ambiguity with traditional `FOR i = 1 TO 10` iteration limits. We resolved this conflict by adopting the universal pseudocode assignment arrow (`<-`) and reserving `TO` strictly for loop boundaries. We also opted out of using standard brackets or curly braces, leaning entirely into matching text boundaries (like `IF` paired with `END IF`) to keep program code clean, flowing, and readable.
+
+## Known limitations
+- Standard multi-line block commenting structures are completely unsupported; documentation annotations are restricted strictly to single-line `>>` prefixes.
+- Compact mutating expressions such as `++`, `--`, or `+=` do not exist, requiring explicit manual assignments (`SET x <- x + 1`).
+- Escape code literals (such as `\n` or `\t`) inside text strings are currently treated as uninterpreted character sets rather than active formatting commands.
+
+## Changelog
+| Activity | What changed in the language |
+|---|---|
+| Lab 1 | Initial language specifications locked; custom operators, tokens, and pseudocode structures defined. |
