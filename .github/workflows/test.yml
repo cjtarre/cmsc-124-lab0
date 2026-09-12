@@ -13,3 +13,4 @@ jobs:
       - run: ./build.sh
       - run: curl -sSL https://raw.githubusercontent.com/WhiteLicorice/cmsc-124-harness/v1.1/run_tests.py -o run_tests.py
       - run: python3 run_tests.py tests/lab0
+      - run: python3 run_tests.py tests/lab1

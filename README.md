@@ -8,8 +8,8 @@
 `SudoCode` is a simplified dynamically-typed language that helps programmers visualize algorithm behavior without being constrained by rigid syntactic overhead. It features a natural-language layout and a loosely structured design that mirrors classic academic pseudocode conventions. Writing in `SudoCode` should feel like drafting a flowchart or a textbook algorithm directly into an executable text file, allowing developers to focus entirely on core computational logic and sequence design rather than bracket tracking and typing safety. 
 
 ## Host language and build
-- Host language: C# (.NET 8.0)
-- Version metadata: [file that pins it, e.g. rust-toolchain.toml, go.mod]
+- Host language: C# (.NET 10.0)
+- Version metadata: `/SudoCode.csproj` (Target Framework: `net10.0`)
 - Build: `./build.sh`
 - A fresh clone requires the host machine to have the .NET 8.0 SDK (or later) installed. Running `./build.sh` triggers `dotnet build --configuration` Release.
 
