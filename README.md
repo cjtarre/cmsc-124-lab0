@@ -11,7 +11,7 @@
 - Host language: C# (.NET 10.0)
 - Version metadata: `/SudoCode.csproj` (Target Framework: `net10.0`)
 - Build: `./build.sh`
-- A fresh clone requires the host machine to have the .NET 8.0 SDK (or later) installed. Running `./build.sh` triggers `dotnet build --configuration` Release.
+- A fresh clone requires the host machine to have the .NET 10.0 SDK (or later) installed. Running `./build.sh` triggers `dotnet build --configuration Release`.
 
 ## Running it
 | Command | What it does |
@@ -49,8 +49,8 @@ All keywords in this language are defined and written in uppercase.
 
 ### Master Token Registry
 ```
-LEFT_PAREN  RIGHT_PAREN  LEFT_BRACE  RIGHT_BRACE
-PLUS  MINUS  STAR  SLASH
+LEFT_PAREN  RIGHT_PAREN
+PLUS  MINUS  STAR  SLASH  MOD
 EQUAL  EQUAL_EQUAL  BANG  BANG_EQUAL  LESS  LESS_EQUAL  GREAT  GREAT_EQUAL
 IDENTIFIER  STRING  NUMBER
 VAR  PRINT  IF  ELSE  WHILE  TRUE  FALSE  NIL
@@ -64,15 +64,6 @@ AND  OR  NOT  XOR
 DOT  COLON  COMMA 
 ```
 
-### Literals
-| Kind | Syntax | Produces |
-|---|---|---|
-| `IDENTIFIER` | *see [`Identifiers`](#identifiers)* | A bound reference name to a stored variable context |
-| `NUMBER` | Digits with optional single dot fractional notation (e.g., `42`, `3.14`) | IEEE 754 double-precision floating-point runtime values |
-| `STRING` | Characters wrapped inside matching double quotation marks (e.g., `"hello"`) | UTF-16 character string runtime values |
-| `BOOLEAN` | Case-sensitive Boolean keywords: `TRUE`, `FALSE` | Logic bit values (`true` / `false`) |
-| `NIL` | The explicit empty value keyword `NIL` | Null pointer baseline references |
-
 ### Operators
 | Operator | Category | Operands | Associativity | Precedence |
 |---|---|---|---|---|
@@ -82,6 +73,15 @@ DOT  COLON  COMMA
 | `NOT` | logical | unary | right | 2 |
 | `AND`, `OR`, `XOR` | logical | binary | left | 1 |
 | `<-` | assignment | binary | right | 0 (*loosest*) |
+
+### Literals
+| Kind | Syntax | Produces |
+|---|---|---|
+| `IDENTIFIER` | *see [`Identifiers`](#identifiers)* | A bound reference name to a stored variable context |
+| `NUMBER` | Digits with optional single dot fractional notation (e.g., `42`, `3.14`) | IEEE 754 double-precision floating-point runtime values |
+| `STRING` | Characters wrapped inside matching double quotation marks (e.g., `"hello"`) | UTF-16 character string runtime values |
+| `BOOLEAN` | Case-sensitive Boolean keywords: `TRUE`, `FALSE` | Logic bit values (`true` / `false`) |
+| `NIL` | The explicit empty value keyword `NIL` | Null pointer baseline references |
 
 ### Identifiers
 - Start characters: Letters `a`-`z`, `A`-`Z`, or an underscore `_`
@@ -101,7 +101,7 @@ DOT  COLON  COMMA
 
 ## Whitespace and termination
 - Whitespace significant: **No**. Whitespace acts as a delimiter to distinguish individual words and symbols but does not dictate program structural grouping or indent validation.
-- Statement terminator: **None**. Code steps are separated implicitly by statement block sequences and structural boundary wrappers. Newlines are handled as standard whitespace.
+- Statement terminator: **None**. Code steps are separated implicitly by statement block sequences and structural boundary wrappers. Newlines are treated as standard whitespace but are tracked for token line numbers.
 - Block delimiters: **Marked explicitly** by corresponding keyword bounds <br>(e.g., `IF` ... `THEN` ... `END IF` or `WHILE` ... `DO` ... `END WHILE`).
 - Grouping delimiters: Standard parentheses `(` and `)` are used to force expression precedence and enclose function/procedure parameters.
 - Token separators: 
@@ -197,7 +197,7 @@ Message format:
 | tests/lab5 | Functions | inline | none |
 
 ```
-[specific tests]...
+Lab 1 tests cover keywords and identifiers, operators, conditional and loop tokens, and lexical error handling.
 ```
 
 Run locally with:
