@@ -4,3 +4,4 @@ INITIALIZE num <- 0
 INITIALIZE is_true <- FALSE
 INITIALIZE l3tter_ <- ""
 INITIALIZE _null <- NIL
+INITIALIZE iffy <- ""
