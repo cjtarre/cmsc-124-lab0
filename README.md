@@ -33,76 +33,45 @@ Exit codes:
 ## Lexical structure
 ### Keywords
 All keywords in this language are defined and written in uppercase.
+| Keyword | Purpose |
+|---|---|
+| `INITIALIZE` | Sets up a variable or data structure with an initial value using `<-`. |
+| `SET` | Modifies the value of an existing variable using `<-`. |
+| `INPUT` | Receives raw input streams from the tracking host environment context. |
+| `OUTPUT` / `PRINT` | Displays stringified evaluation representations to the standard stdout terminal stream. |
+| `IF` / `THEN` / `ELSE` | Controls conditional multi-branch logical flow paths. |
+| `FOR` / `EACH` / `IN` / `TO` / `STEP` | Handles counter and range-based sequence loops. |
+| `WHILE` / `DO` | Spawns traditional conditional execution iteration tracks. |
+| `REPEAT` / `UNTIL` | Spawns standard bottom-driven boundary loop structures. |
+| `CASE` / `OF` / `DEFAULT` | Manages structural multi-option expression selections. |
+| `FUNCTION` / `PROCEDURE` / `CALL` / `RETURN` | Formulates explicit modular routine structures and scope executions. |
+| `END` | Explicitly seals structural layout blocks (e.g., `END IF`, `END WHILE`). |
 
 ### Master Token Registry
 ```
-LEFT_PAREN RIGHT_PAREN 
-PLUS MINUS STAR SLASH EQUAL 
-EQUAL_EQUAL BANG BANG_EQUAL LESS LESS_EQUAL GREATER GREATER_EQUAL 
-VAR IDENTIFIER STRING NUMBER 
+LEFT_PAREN  RIGHT_PAREN  LEFT_BRACE  RIGHT_BRACE
+PLUS  MINUS  STAR  SLASH
+EQUAL  EQUAL_EQUAL  BANG  BANG_EQUAL  LESS  LESS_EQUAL  GREAT  GREAT_EQUAL
+IDENTIFIER  STRING  NUMBER
+VAR  PRINT  IF  ELSE  WHILE  TRUE  FALSE  NIL
 EOF
-
-SET INITIALIZE
-INPUT OUTPUT
-
-END
-IF THEN ELSE
-FOR EACH IN TO
-WHILE DO
-REPEAT UNTIL
-CASE OF COLON DEFAULT
-
-CALL RETURN
-FUNCTION PROCEDURE
-
-AND OR NOT XOR
-TRUE FALSE NIL
+```
+```
+SET  INITIALIZE  INPUT  OUTPUT 
+END  THEN  FOR  EACH  IN  TO  DO  REPEAT  UNTIL  CASE  OF  DEFAULT 
+CALL  RETURN  FUNCTION  PROCEDURE 
+AND  OR  NOT  XOR
+DOT  COLON  COMMA 
 ```
 
 ### Literals
 | Kind | Syntax | Produces |
 |---|---|---|
-| `IDENTIFIER` | *See* [`Identifiers`](#identifiers) | A bound reference name to a stored variable context |
+| `IDENTIFIER` | *see [`Identifiers`](#identifiers)* | A bound reference name to a stored variable context |
 | `NUMBER` | Digits with optional single dot fractional notation (e.g., `42`, `3.14`) | IEEE 754 double-precision floating-point runtime values |
 | `STRING` | Characters wrapped inside matching double quotation marks (e.g., `"hello"`) | UTF-16 character string runtime values |
 | `BOOLEAN` | Case-sensitive Boolean keywords: `TRUE`, `FALSE` | Logic bit values (`true` / `false`) |
 | `NIL` | The explicit empty value keyword `NIL` | Null pointer baseline references |
-
-#### Data Handling
-| Keyword | Purpose |
-|---|---|
-| `INPUT` | Used to receive input from the user or another source. |
-| `OUTPUT` `PRINT` | Used to display output to the user. |
-| `INITIALIZE` | Sets up variables or data structures with initial values using `<-`. |
-| `SET` | Used to assign a value to a variable using `<-`. |
-
-#### Control Structures
-| Keyword | Purpose |
-|---|---|
-| `END` | Marks the end of a code block, used in conjunction with another keyword. <br>Valid keywords: `END IF`,  `END FOR`, `END WHILE`, `END CASE`, `END FUNCTION`, `END PROCEDURE` |
-| `IF` | Used to specify a condition. Evaluates as `TRUE` or `FALSE`. |
-| `THEN` | Executes the succeeding instructions when associated `IF` evaluates `true`.   |
-| `ELSE` | Executes the alternative instructions when associated `IF` evaluates `false`. <br> Can be combined with another `IF` to specify additional conditions. |
-| `FOR` | Represents a loop that repeats a block of code a specific number of times. |
-| `EACH` | Used in conjunction with `FOR` to specify iteration over every element in a collection (e.g., `FOR EACH item IN array DO`). |
-| `IN` | Delimiter keyword specifying the collection or range being iterated through inside a loop. |
-| `TO` | Used inside a `FOR` loop to specify the upper boundary limit <br>(e.g., `FOR i = 1 TO 10`). |
-| `STEP` | Specifies the increment or decrement value in a `FOR` loop <br>(e.g., `FOR i <- 1 TO 10 STEP 2`). |
-| `WHILE` | Represents a loop that continues to execute as long as a condition is true. |
-| `DO` | Delimiter keyword that opens the execution body of a `WHILE` or `FOR` loop |
-| `REPEAT` | Represents a loop that continues to execute until the specified condition is true. |
-| `UNTIL` | Used with `REPEAT` or `DO`, specifies the condition for the loop to stop. |
-| `CASE` | Used to select one of many blocks of code to execute. |
-| `OF` | Used in conjunction with `CASE` to define possible values. |
-| `DEFAULT` | Act as the fallback execution choice if no `WHEN` blocks match inside a `CASE` statement. |
-
-#### Functions and Procedures
-| Keyword | Purpose |
-|---|---|
-| `FUNCTION` | Defines a function that returns a value. |
-| `PROCEDURE` | Defines a function that does not return a value. |
-| `CALL` | Executes a function or procedure. |
-| `RETURN` | Specifies the value to return from a function.  |
 
 ### Operators
 | Operator | Category | Operands | Associativity | Precedence |
@@ -115,8 +84,8 @@ TRUE FALSE NIL
 | `<-` | assignment | binary | right | 0 (*loosest*) |
 
 ### Identifiers
-- Start characters: Letters `a-z`, `A-Z`, or an underscore `_`
-- Continue characters: Letters `a-z`, `A-Z`, numbers `0-9` or an underscore `_`
+- Start characters: Letters `a`-`z`, `A`-`Z`, or an underscore `_`
+- Continue characters: Letters `a`-`z`, `A`-`Z`, numbers `0`-`9` or an underscore `_`
 - Case-sensitive: **Yes**.
 - Compound instructions like `END IF` or `ELSE IF` are scanned as independent tokens (`END` followed by `IF`) and handled at the grammar phase. 
 - Variable names cannot perfectly match any singular keyword identifier list.
@@ -135,15 +104,18 @@ TRUE FALSE NIL
 - Statement terminator: **None**. Code steps are separated implicitly by statement block sequences and structural boundary wrappers. Newlines are handled as standard whitespace.
 - Block delimiters: **Marked explicitly** by corresponding keyword bounds <br>(e.g., `IF` ... `THEN` ... `END IF` or `WHILE` ... `DO` ... `END WHILE`).
 - Grouping delimiters: Standard parentheses `(` and `)` are used to force expression precedence and enclose function/procedure parameters.
-- Token separators: Commas `,` are used to separate parameters in function definitions, and colons `:` are used to mark individual branch blocks inside conditional `CASE` statements.
+- Token separators: 
+  - Commas `,` are used to separate parameters in function definitions.
+  - Colons `:` mark branch blocks inside conditional `CASE` statements
+  - Dots `.` are used as an explicit member access operator for dot notation structures.
 
 ## Token output format
 ```
-Token(type=VAR, lexeme="INITIALIZE", literal=null, line=1)
-Token(type=IDENTIFIER, lexeme="counter", literal=null, line=1)
-Token(type=EQUAL, lexeme="<-", literal=null, line=1)
-Token(type=NUMBER, lexeme="10", literal=10.0, line=1)
-Token(type=EOF, lexeme="", literal=null, line=1)
+Token(type=VAR, lexeme=INITIALIZE, literal=null, line=1)
+Token(type=IDENTIFIER, lexeme=counter, literal=null, line=1)
+Token(type=EQUAL, lexeme=<-, literal=null, line=1)
+Token(type=NUMBER, lexeme=10, literal=10.0, line=1)
+Token(type=EOF, lexeme=, literal=null, line=1)
 ```
 - `type`: The internal enum categorization of the matched string token.
 - `lexeme`: The literal exact substring sequence sliced directly from the `.sudo` raw file.
@@ -152,18 +124,13 @@ Token(type=EOF, lexeme="", literal=null, line=1)
 
 ## Grammar
 *To be defined in a later lab activity.*
-```
-[CFG table.]
-```
 
 ## Parse output format
 *To be defined in a later lab activity.*
-```
-[Sample console code.]
-```
 
 ## Semantics
 *To be defined in a later lab activity.*
+
 ### Values and types
 `SudoCode` supports four core runtime data primitive types managed dynamically in the host architecture:
 - **Numbers**: Represented inside the host engine environment as native C# `double` precision variables for dynamic typing compatibility.
@@ -173,8 +140,8 @@ Token(type=EOF, lexeme="", literal=null, line=1)
 
 ### Value printing
 - Numbers: Prints without trailing decimals if it is an integer representation (e.g., `5`), or with explicit fractional scales if a true floating-point value is maintained (e.g., `5.25`).
-- Nil: Prints explicitly as the lowercase textual literal `nil`.
 - Strings: Extracted and printed directly to standard output without surrounding quotation marks.
+- Nil: Prints explicitly as the lowercase textual literal `nil`.
 
 ### Truthiness
 `SudoCode` follows a strict truthiness evaluation rule:
@@ -204,9 +171,6 @@ Token(type=EOF, lexeme="", literal=null, line=1)
 
 ## Native functions
 *To be defined in a later lab activity.*
-| Name | Arguments | Returns | Notes |
-|---|---|---|---|
-| [name] | [count and types] | [type] | [caveats] |
 
 ## Errors and diagnostics
 Message format:
