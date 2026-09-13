@@ -28,7 +28,7 @@ Exit codes:
 - `70`: When a runtime exception is thrown during evaluation.
 
 ## File extension
-`.sudo` - a stylized abbreviation of the word Pseudo.
+`.sudo` - a stylized abbreviation of the word '*pseudo*'.
 
 ## Lexical structure
 ### Keywords
@@ -51,27 +51,24 @@ All keywords in this language are defined and written in uppercase.
 ```
 LEFT_PAREN  RIGHT_PAREN
 PLUS  MINUS  STAR  SLASH  MOD
-EQUAL  EQUAL_EQUAL  BANG  BANG_EQUAL  LESS  LESS_EQUAL  GREAT  GREAT_EQUAL
+ASSIGN  NOT_EQUAL  LESSER  LESSER_EQUAL  GREATER  GREATER_EQUAL
 IDENTIFIER  STRING  NUMBER
-VAR  PRINT  IF  ELSE  WHILE  TRUE  FALSE  NIL
+INITIALIZE  SET  INPUT  OUTPUT  PRINT
+IF  THEN  ELSE  WHILE  DO  FOR  EACH  IN  TO  STEP  REPEAT  UNTIL
+CASE  OF  DEFAULT  FUNCTION  PROCEDURE  CALL  RETURN  END
+AND  OR  NOT  XOR  TRUE  FALSE  NIL
+DOT  COLON  COMMA  LEFT_ARROW
 EOF
-```
-```
-SET  INITIALIZE  INPUT  OUTPUT 
-END  THEN  FOR  EACH  IN  TO  DO  REPEAT  UNTIL  CASE  OF  DEFAULT 
-CALL  RETURN  FUNCTION  PROCEDURE 
-AND  OR  NOT  XOR
-DOT  COLON  COMMA 
 ```
 
 ### Operators
 | Operator | Category | Operands | Associativity | Precedence |
 |---|---|---|---|---|
-| `*`, `/`, `MOD` | arithmetic | binary | left | 5 (*tightest*) |
+| `*`, `/`, `%`, `MOD` | arithmetic | binary | left | 5 (*tightest*) |
 | `+`, `-` | arithmetic | binary | left | 4 |
 | `=`, `>`, `>=`, `<`, `<=`, `!=` | comparison | binary | left | 3 |
-| `NOT` | logical | unary | right | 2 |
-| `AND`, `OR`, `XOR` | logical | binary | left | 1 |
+| `NOT`, `!` | logical | unary | right | 2 |
+| `AND`, `&&`, `OR`, `\|\|`, `XOR` | logical | binary | left | 1 |
 | `<-` | assignment | binary | right | 0 (*loosest*) |
 
 ### Literals
@@ -111,9 +108,9 @@ DOT  COLON  COMMA
 
 ## Token output format
 ```
-Token(type=VAR, lexeme=INITIALIZE, literal=null, line=1)
+Token(type=INITIALIZE, lexeme=INITIALIZE, literal=null, line=1)
 Token(type=IDENTIFIER, lexeme=counter, literal=null, line=1)
-Token(type=EQUAL, lexeme=<-, literal=null, line=1)
+Token(type=ASSIGN, lexeme=<-, literal=null, line=1)
 Token(type=NUMBER, lexeme=10, literal=10.0, line=1)
 Token(type=EOF, lexeme=, literal=null, line=1)
 ```
