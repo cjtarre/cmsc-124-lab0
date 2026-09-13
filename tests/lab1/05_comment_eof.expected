@@ -1,5 +1,5 @@
-Token(type=VAR, lexeme=INITIALIZE, literal=null, line=1)
+Token(type=INITIALIZE, lexeme=INITIALIZE, literal=null, line=1)
 Token(type=IDENTIFIER, lexeme=x, literal=null, line=1)
-Token(type=EQUAL, lexeme=<-, literal=null, line=1)
+Token(type=ASSIGN, lexeme=<-, literal=null, line=1)
 Token(type=NUMBER, lexeme=5, literal=5.0, line=1)
 Token(type=EOF, lexeme=, literal=null, line=1)
