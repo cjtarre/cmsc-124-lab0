@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿﻿using System.Text;
 
 static int Fail(string message)
 {
@@ -41,4 +41,4 @@ try
 catch (Exception error) when (error is IOException or UnauthorizedAccessException)
 {
     return Fail($"cannot read '{path}': {error.Message}");
-}
+} No newline at end of file
