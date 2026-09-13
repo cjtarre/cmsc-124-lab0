@@ -4,7 +4,6 @@ public class Scanner
     private readonly List<Token> tokens = new();
 
     private bool hadError = false;
-
     public bool HadError => hadError;
 
     private static readonly Dictionary<string, TokenType> keywords = new()
@@ -58,10 +57,7 @@ public class Scanner
     private int current = 0;
     private int line = 1;
 
-    public Scanner(string source)
-    {
-        this.source = source;
-    }
+    public Scanner(string source) => this.source = source;
 
     private char Advance()
     {
@@ -70,49 +66,25 @@ public class Scanner
         return character;
     }
 
-    private bool IsAtEnd()
-    {
-        return current >= source.Length;
-    }
+    private bool IsAtEnd() => current >= source.Length;
 
     private char Peek()
     {
-        if (IsAtEnd())
-        {
-            return '\0';
-        }
-
+        if (IsAtEnd()) return '\0';
         return source[current];
     }
 
     private bool Match(char expected)
     {
-        if (IsAtEnd())
-        {
-            return false;
-        }
-
-        if (source[current] != expected)
-        {
-            return false;
-        }
+        if (IsAtEnd()) return false;
+        if (source[current] != expected) return false;
 
         current++;
         return true;
     }
 
-    private bool IsAlpha(char character)
-    {
-        return (character >= 'a' && character <= 'z')
-            || (character >= 'A' && character <= 'Z')
-            || character == '_';
-    }
-
-    private bool IsAlphaNumeric(char character)
-    {
-        return IsAlpha(character)
-            || (character >= '0' && character <= '9');
-    }
+    private bool IsAlpha(char character) => (character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z') || character == '_';
+    private bool IsAlphaNumeric(char character) => IsAlpha(character)|| (character >= '0' && character <= '9');
 
     public List<Token> ScanTokens()
     {
@@ -123,7 +95,6 @@ public class Scanner
         }
 
         tokens.Add(new Token(TokenType.EOF, "", null, line));
-
         return tokens;
     }
 
@@ -131,148 +102,66 @@ public class Scanner
     {
         char character = Advance();
 
-        if (character == '(')
-        {
-            AddToken(TokenType.LEFT_PAREN);
+        if (character == '(') AddToken(TokenType.LEFT_PAREN);
+        else if (character == ')') AddToken(TokenType.RIGHT_PAREN);
+        else if (character == '+') AddToken(TokenType.PLUS);
+        else if (character == '-') AddToken(TokenType.MINUS);
+        else if (character == '*') AddToken(TokenType.STAR);
+        else if (character == '/') AddToken(TokenType.SLASH);
+        else if (character == '=') AddToken(TokenType.EQUAL_EQUAL);
+        else if (character == '!') {
+            if (Match('=')) AddToken(TokenType.BANG_EQUAL);
+            else AddToken(TokenType.BANG);
+            
         }
-        else if (character == ')')
-        {
-            AddToken(TokenType.RIGHT_PAREN);
+        else if (character == '<') {
+            if (Match('=')) AddToken(TokenType.LESS_EQUAL);
+            else if (Match('-')) AddToken(TokenType.EQUAL);
+            else AddToken(TokenType.LESS);
+            
         }
-        else if (character == '+')
-        {
-            AddToken(TokenType.PLUS);
+        else if (character == '>') {
+            if (Match('>')) { while (Peek() != '\n' && !IsAtEnd()) { Advance(); } }
+            else if (Match('=')) AddToken(TokenType.GREAT_EQUAL);
+            else AddToken(TokenType.GREAT);
         }
-        else if (character == '-')
-        {
-            AddToken(TokenType.MINUS);
-        }
-        else if (character == '*')
-        {
-            AddToken(TokenType.STAR);
-        }
-        else if (character == '/')
-        {
-            AddToken(TokenType.SLASH);
-        }
-        else if (character == '=')
-        {
-            AddToken(TokenType.EQUAL_EQUAL);
-        }
-        else if (character == '!')
-        {
-            if (Match('='))
-            {
-                AddToken(TokenType.BANG_EQUAL);
-            }
-            else
-            {
-                AddToken(TokenType.BANG);
-            }
-        }
-        else if (character == '<')
-        {
-            if (Match('='))
-            {
-                AddToken(TokenType.LESS_EQUAL);
-            }
-            else if (Match('-'))
-            {
-                AddToken(TokenType.EQUAL);
-            }
-            else
-            {
-                AddToken(TokenType.LESS);
-            }
-        }
-        else if (character == '>')
-        {
-            if (Match('>'))
-            {
-                while (Peek() != '\n' && !IsAtEnd())
-                {
-                    Advance();
-                }
-            }
-            else if (Match('='))
-            {
-                AddToken(TokenType.GREAT_EQUAL);
-            }
-            else
-            {
-                AddToken(TokenType.GREAT);
-            }
-        }
-        else if (character == ' ' || character == '\t' || character == '\r')
-        {
-            return;
-        }
-        else if (character == '\n')
-        {
-            line++;
-            return;
-        }
-        else if (character == '"')
-        {
-            String();
-        }
-        else if (character >= '0' && character <= '9')
-        {
-            Number();
-        }
-        else if (IsAlpha(character))
-        {
-            Identifier();
+        else if (character == ' ' || character == '\t' || character == '\r')   return;
+        else if (character == '\n') { line++; return;}
+        else if (character == '"') String();
+        else if (character >= '0' && character <= '9') Number();
+        else if (IsAlpha(character)) Identifier();
+        else {
+            hadError = true;
+            Console.Error.WriteLine( $"[Line {line}] Lexical Error: Unexpected character '{character}'.");
         }
     }
 
     private void Identifier()
     {
-        while (IsAlphaNumeric(Peek()))
-        {
-            Advance();
-        }
+        while (IsAlphaNumeric(Peek())) { Advance(); }
 
         string text = source[start..current];
 
         if (keywords.TryGetValue(text, out TokenType type))
         {
-            if (type == TokenType.TRUE)
-            {
-                AddToken(TokenType.TRUE, true);
-            }
-            else if (type == TokenType.FALSE)
-            {
-                AddToken(TokenType.FALSE, false);
-            }
-            else
-            {
-                AddToken(type);
-            }
+            if (type == TokenType.TRUE) AddToken(TokenType.TRUE, true);
+            else if (type == TokenType.FALSE) AddToken(TokenType.FALSE, false);
+            else AddToken(type);
         }
-        else
-        {
-            AddToken(TokenType.IDENTIFIER);
-        }
+        else AddToken(TokenType.IDENTIFIER);
     }
 
     private void String()
     {
-        while (Peek() != '"' && !IsAtEnd())
-        {
-            if (Peek() == '\n')
-            {
-                line++;
-            }
-
+        while (Peek() != '"' && !IsAtEnd()) {
+            if (Peek() == '\n')  line++;
             Advance();
         }
 
         if (IsAtEnd())
         {
             hadError = true;
-            Console.Error.WriteLine(
-                $"[Line {line}] Lexical Error: Unterminated string.");
+            Console.Error.WriteLine( $"[Line {line}] Lexical Error: Unterminated string.");
             return;
         }
 
@@ -284,10 +173,7 @@ public class Scanner
 
     private void Number()
     {
-        while (Peek() >= '0' && Peek() <= '9')
-        {
-            Advance();
-        }
+        while (Peek() >= '0' && Peek() <= '9') { Advance(); }
 
         if (Peek() == '.' && current + 1 < source.Length
             && source[current + 1] >= '0'
@@ -295,10 +181,7 @@ public class Scanner
         {
             Advance();
 
-            while (Peek() >= '0' && Peek() <= '9')
-            {
-                Advance();
-            }
+            while (Peek() >= '0' && Peek() <= '9') { Advance(); }
         }
 
         double value = double.Parse(source[start..current]);
