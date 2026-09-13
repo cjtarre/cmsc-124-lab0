@@ -1,41 +1,75 @@
 class Scanner {
     // source code to scan
     private readonly string _source;
-    private readonly List<Token> _tokens = new List<Token>();
+    private readonly List<Token> _tokens = [];
+    private static readonly Dictionary<string, TokenType> _keywords = new Dictionary<string, TokenType> {
+        ["INITIALIZE"] = TokenType.INITIALIZE,
+        ["SET"] = TokenType.SET,
+        ["INPUT"] = TokenType.INPUT,
+        ["OUTPUT"] = TokenType.OUTPUT,
+        ["PRINT"] = TokenType.PRINT,
+
+        ["IF"] = TokenType.IF,
+        ["THEN"] = TokenType.THEN,
+        ["ELSE"] = TokenType.ELSE,
+
+        ["FOR"] = TokenType.FOR,
+        ["EACH"] = TokenType.EACH,
+        ["IN"] = TokenType.IN,
+        ["TO"] = TokenType.TO,
+        ["STEP"] = TokenType.STEP,
+
+        ["WHILE"] = TokenType.WHILE,
+        ["DO"] = TokenType.DO,
+
+        ["REPEAT"] = TokenType.REPEAT,
+        ["UNTIL"] = TokenType.UNTIL,
+
+        ["CASE"] = TokenType.CASE,
+        ["OF"] = TokenType.OF,
+        ["DEFAULT"] = TokenType.DEFAULT,
+
+        ["FUNCTION"] = TokenType.FUNCTION,
+        ["PROCEDURE"] = TokenType.PROCEDURE,
+        ["CALL"] = TokenType.CALL,
+        ["RETURN"] = TokenType.RETURN,
+
+        ["END"] = TokenType.END,
+
+        ["TRUE"] = TokenType.TRUE,
+        ["FALSE"] = TokenType.FALSE,
+        ["NIL"] = TokenType.NIL,
+
+        ["AND"] = TokenType.AND,
+        ["OR"] = TokenType.OR,
+        ["NOT"] = TokenType.NOT,
+        ["XOR"] = TokenType.XOR,
+
+        ["MOD"] = TokenType.MOD
+        };
 
     // marker references
     private int _current = 0;
     private int _start = 0;
     private int _line = 1;
 
-    public Scanner(string source){ 
-        _source = source;
-    }
+    public Scanner(string source) => _source = source;
     
     // helper methods
-    public bool IsAtEnd() {
-        return _current >= _source.Length;
-    }
-
-    public void AddToken(TokenType type, object? literal = null) {
-        string text = _source.Substring(_start, _current - _start);
-        _tokens.Add(new Token(type, text, literal, _line));
-    }
-    
-    public char Advance() {
-        return _source[_current++];
-    }
-
-    public char Peek(int offset = 0) {
-        if (IsAtEnd()) return '\0';
-        return _source[_current + offset];
-    }
+    public bool IsAtEnd() => _current >= _source.Length;
+    public char Advance() => _source[_current++];
+    public char Peek(int offset = 0) => (IsAtEnd() || _current + offset >= _source.Length) ? '\0' : _source[_current + offset];
     
     public bool Match(char expected) {
         if (IsAtEnd()) return false;
         if (_source[_current] != expected) return false;
         _current++;
         return true;
+    }
+    public void AddToken(TokenType type, object? literal = null) => _tokens.Add(new Token(type, _source[_start .. _current], literal, _line));
+    public void FlagError(string message) {
+        Console.Error.WriteLine($"[Line {_line}] Lexical Error: {message}");
+        Environment.Exit(65);
     }
     
     // core scanner methods
@@ -44,7 +78,7 @@ class Scanner {
             _start = _current;
             ScanToken();
         }
-        _start = _current;
+        _start = _source.Length;
         AddToken(TokenType.EOF);
 
         foreach (Token token in _tokens) {
@@ -70,122 +104,62 @@ class Scanner {
 
             // tokens that can be more than one character
             case '<':
-                if (Match('=')) {
-                    AddToken(TokenType.LESSER_EQUAL);
-                } else if (Match('-')) {
-                    AddToken(TokenType.ASSIGN);
-                } else {
-                    AddToken(TokenType.LESSER);
-                }
+                if (Match('='))         AddToken(TokenType.LESSER_EQUAL);
+                else if (Match('-'))    AddToken(TokenType.ASSIGN);
+                else                    AddToken(TokenType.LESSER);
                 break;
+
             case '>':
-                if (Match('=')) {
-                    AddToken(TokenType.GREATER_EQUAL);
-                } else if (Match('>')){     // skip comments starting with ">>"
-                    while (Peek() != '\n' && !IsAtEnd()) {
-                        Advance();
-                    }
-                } else {
-                    AddToken(TokenType.GREATER);
-                }
+                if (Match('='))         AddToken(TokenType.GREATER_EQUAL);
+                // skip comments starting with ">>"
+                else if (Match('>'))    while (Peek() != '\n' && !IsAtEnd()) Advance();
+                else                    AddToken(TokenType.GREATER);
                 break;
+
             case '!':
-                if (Match('=')) {
-                    AddToken(TokenType.NOT_EQUAL);
-                } else {
-                    AddToken(TokenType.NOT);
-                }
+                if (Match('='))         AddToken(TokenType.NOT_EQUAL);
+                else                    AddToken(TokenType.NOT);
                 break;
+
             case '&':
-                if (Match('&')) {
-                    AddToken(TokenType.AND);
-                } else {
-                    throw new Exception($"[Line {_line}] Lexical Error: Unexpected character '{c}' found in scan block.");
-                }
+                if (Match('&'))         AddToken(TokenType.AND);
+                else                    FlagError($"Unexpected character '{c}' found in scan block.");
                 break;
+
+            // ignore whitespace
+            case ' ' or '\t' or '\r':   break;
+            case '\n':                  _line++; break;
+
             case '|':
-                if (Match('|')) {
-                    AddToken(TokenType.OR);
-                } else {
-                    throw new Exception($"[Line {_line}] Lexical Error: Unexpected character '{c}' found in scan block.");
-                }
+                if (Match('|'))         AddToken(TokenType.OR);
+                else                    FlagError($"Unexpected character '{c}' found in scan block.");
                 break;
+
             case '"':
                 ScanString();
                 break;
 
             default:
-                if (char.IsWhiteSpace(c)) {
-                    if (c == '\n') _line++;
-                } 
-                else if (char.IsLetter(c) || c == '_') {
-                    ScanKeyword();
-                }
-                else if (char.IsDigit(c)) {
-                    ScanNumber();
-                }    
-                else {
-                    throw new Exception($"[Line {_line}] Lexical Error: Unexpected character '{c}' found in scan block.");
-                }
+                if (char.IsLetter(c) || c == '_')       ScanKeyword();
+                else if (char.IsDigit(c))               ScanNumber(); 
+                else                                    FlagError($"Unexpected character '{c}' found in scan block.");
                 break;
         }
     }
 
     private void ScanKeyword() {
-        while ((char.IsLetterOrDigit(Peek()) || Peek() == '_') && !IsAtEnd()) {
-            Advance();
-        }
-        string text = _source.Substring(_start, _current - _start);
-        TokenType type = text switch {
-            "INITIALIZE" => TokenType.INITIALIZE,
-            "SET" => TokenType.SET,
-            "INPUT" => TokenType.INPUT,
-            "OUTPUT" => TokenType.OUTPUT,
-            "PRINT" => TokenType.PRINT,
-            "IF" => TokenType.IF,
-            "THEN" => TokenType.THEN,
-            "ELSE" => TokenType.ELSE,
-            "FOR" => TokenType.FOR,
-            "EACH" => TokenType.EACH,
-            "IN" => TokenType.IN,
-            "TO" => TokenType.TO,
-            "STEP" => TokenType.STEP,
-            "WHILE" => TokenType.WHILE,
-            "DO" => TokenType.DO,
-            "REPEAT" => TokenType.REPEAT,
-            "UNTIL" => TokenType.UNTIL,
-            "CASE" => TokenType.CASE,
-            "OF" => TokenType.OF,
-            "DEFAULT" => TokenType.DEFAULT,
-            "FUNCTION" => TokenType.FUNCTION,
-            "PROCEDURE" => TokenType.PROCEDURE,
-            "CALL" => TokenType.CALL,
-            "RETURN" => TokenType.RETURN,
-            "END" => TokenType.END,
-            "TRUE" => TokenType.TRUE,
-            "FALSE" => TokenType.FALSE,
-            "NIL" => TokenType.NIL,
-            "AND" => TokenType.AND,
-            "OR" => TokenType.OR,
-            "NOT" => TokenType.NOT,
-            "MOD" => TokenType.MOD,
-            "XOR" => TokenType.XOR,
-            _ => TokenType.IDENTIFIER
-        };
-        switch (type) {
-            case TokenType.TRUE:
-                AddToken(type, true);
-                break;
-            case TokenType.FALSE:
-                AddToken(type, false);
-                break;
-            case TokenType.NIL:
-                AddToken(type, null);
-                break;
-            default:
-                AddToken(type);
-                break;
-        }
+        while ((char.IsLetterOrDigit(Peek()) || Peek() == '_') && !IsAtEnd()) Advance();
+        string text = _source[_start .. _current];
+
+        if (_keywords.TryGetValue(text, out TokenType type)) {
+            switch (type) {
+                case TokenType.TRUE:        AddToken(type, true); break;
+                case TokenType.FALSE:       AddToken(type, false); break;
+                case TokenType.NIL:         AddToken(type, null); break;
+                default:                    AddToken(type); break;
+            }
+        } else AddToken(TokenType.IDENTIFIER);
+
     }
 
     private void ScanString() {
@@ -193,16 +167,11 @@ class Scanner {
             if (Peek() == '\n') _line++;
             Advance();
         }
-
-        if (IsAtEnd()) {
-            throw new Exception($"[Line {_line}] Unterminated String Error: expected closing \"");
-        }
+        if (IsAtEnd()) FlagError("Unterminated string.");
 
         // consume the closing "
         Advance();
-
-        // trim the surrounding quotes
-        string value = _source.Substring(_start + 1, _current - _start - 2);
+        string value = _source[(_start + 1) .. (_current - 1)];
         AddToken(TokenType.STRING, value);
     }
     
@@ -215,8 +184,7 @@ class Scanner {
             while (char.IsDigit(Peek())) Advance();
         }
 
-        string text = _source.Substring(_start, _current - _start);
-        double value = double.Parse(text, System.Globalization.CultureInfo.InvariantCulture);
+        double value = double.Parse(_source[_start .. _current], System.Globalization.CultureInfo.InvariantCulture);
         AddToken(TokenType.NUMBER, value);
     }
 }
