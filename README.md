@@ -5,7 +5,7 @@
 - Ma. Christie Jude Tarre ([`cjtarre`](https://github.com/cjtarre))
 
 ## Overview
-`SudoCode` is a simplified dynamically-typed language that helps programmers visualize algorithm behavior without being constrained by rigid syntactic overhead. It features a natural-language layout and a loosely structured design that mirrors classic academic pseudocode conventions. Writing in `SudoCode` should feel like drafting a flowchart or a textbook algorithm directly into an executable text file, allowing developers to focus entirely on core computational logic and sequence design rather than bracket tracking and typing safety. 
+`SudoCode` is a simplified dynamically-typed language that helps programmers visualize algorithm behavior without being constrained by rigid syntactic overhead. It features a natural-language layout and a loosely structured design that mirrors classic academic pseudocode conventions. Writing in `SudoCode` should feel like drafting a flowchart or a textbook algorithm directly into an executable text file, allowing developers to focus entirely on core computational logic and sequence design rather than bracket tracking and type safety. 
 
 ## Host language and build
 - Host language: C# (.NET 10.0)
@@ -51,13 +51,13 @@ All keywords in this language are defined and written in uppercase.
 ```
 LEFT_PAREN  RIGHT_PAREN
 PLUS  MINUS  STAR  SLASH  MOD
-ASSIGN  NOT_EQUAL  LESSER  LESSER_EQUAL  GREATER  GREATER_EQUAL
+ASSIGN  EQUAL  NOT_EQUAL  LESSER  LESSER_EQUAL  GREATER  GREATER_EQUAL
 IDENTIFIER  STRING  NUMBER
 INITIALIZE  SET  INPUT  OUTPUT  PRINT
 IF  THEN  ELSE  WHILE  DO  FOR  EACH  IN  TO  STEP  REPEAT  UNTIL
 CASE  OF  DEFAULT  FUNCTION  PROCEDURE  CALL  RETURN  END
 AND  OR  NOT  XOR  TRUE  FALSE  NIL
-DOT  COLON  COMMA  LEFT_ARROW
+DOT  COLON  COMMA
 EOF
 ```
 
@@ -224,7 +224,7 @@ Output:
 ## Design rationale
 `SudoCode` was intentionally designed to capture the structural clarity of classic academic pseudocode while eliminating C-style syntax clutter. We explicitly decoupled our keywords to follow simple, clean, individual token blocks (such as processing `END` and `IF` as separate tokens rather than a single compound lexeme), allowing our upcoming parser rules to safely establish scope logic. We chose to separate declaration (`INITIALIZE`) from mutation (`SET`) to enforce absolute clarity when reading state transformations. 
 
-Our most significant mid-design pivot was removing the dual assignment meaning of the `TO` keyword. Originally conceptualized for assignments (e.g., `SET x TO 5`), this created a parsing ambiguity with traditional `FOR i IN 1 TO 10` iteration limits. We resolved this conflict by adopting the universal pseudocode assignment arrow (`<-`) and reserving `TO` strictly for loop boundaries. We also opted out of using standard brackets or curly braces, leaning entirely into matching text boundaries (like `IF` paired with `END IF`) to keep program code clean, flowing, and readable.
+Our most significant mid-design pivot was removing the dual assignment meaning of the `TO` keyword. Originally conceptualized for assignments (e.g., `SET x TO 5`), this created a parsing ambiguity with traditional `FOR i IN 1 TO 10` iteration limits. We resolved this conflict by adopting the universal pseudocode assignment arrow (`<-`) and reserving `TO` strictly for loop boundaries. We also opted out of using standard brackets or curly braces, leaning entirely into matching text boundaries (like `IF` paired with `END IF`) to keep program code clean, flowing, and readable. It was also decided to allow for alternative symbols such as `\|\|` and `&&` for shorthand input for more flexible code with the conceptualized language. 
 
 ## Known limitations
 - Standard multi-line block commenting structures are completely unsupported; documentation annotations are restricted strictly to single-line `>>` prefixes.
