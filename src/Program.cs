@@ -21,9 +21,23 @@ static int LoadFile(string path) {
     }
 }
 
+static int REPL() {
+    Console.WriteLine("SudoCode REPL 0.1.0 (Press Ctrl+C to exit)");
+    while (true) {
+        Console.Write("> ");
+        string? line = Console.ReadLine();
+        if (line == null) {
+            break;
+        }
+        Scanner scanner = new Scanner(line);
+        scanner.ScanTokens();
+    }
+    return 0;
+}
+
 // Main program entry point
 if (args.Length == 0) {
-    return Fail("expected a source-file path or --tokenize <source-file>");
+    return REPL();
 }
 string path;
 switch (args[0]) {
