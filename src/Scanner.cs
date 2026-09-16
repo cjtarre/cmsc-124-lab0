@@ -108,6 +108,7 @@ class Scanner {
             case '*': AddToken(TokenType.STAR); break;
             case '/': AddToken(TokenType.SLASH); break;
             case '%': AddToken(TokenType.MOD); break;
+            case '^': AddToken(TokenType.EXP); break;
 
             // tokens that can be more than one character
             case '<':

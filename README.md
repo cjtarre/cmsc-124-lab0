@@ -64,11 +64,14 @@ EOF
 ### Operators
 | Operator | Category | Operands | Associativity | Precedence |
 |---|---|---|---|---|
-| `*`, `/`, `%`, `MOD` | arithmetic | binary | left | 5 (*tightest*) |
-| `+`, `-` | arithmetic | binary | left | 4 |
-| `=`, `>`, `>=`, `<`, `<=`, `!=` | comparison | binary | left | 3 |
-| `NOT`, `!` | logical | unary | right | 2 |
-| `AND`, `&&`, `OR`, `\|\|`, `XOR` | logical | binary | left | 1 |
+| `(`, `)` | grouping | binary | right | 8 (*tightest*) |
+| `^` | arithmetic | binary | right | 7 |
+| `*`, `/`, `%`, `MOD` | arithmetic | binary | left | 6 |
+| `+`, `-` | arithmetic | binary | left | 5 |
+| `=`, `>`, `>=`, `<`, `<=`, `!=` | comparison | binary | left | 4 |
+| `NOT`, `!` | logical | unary | right | 3 |
+| `AND`, `&&` | logical | binary | left | 2 |
+| `OR`, `\|\|`, `XOR` | logical | binary | left | 1 |
 | `<-` | assignment | binary | right | 0 (*loosest*) |
 
 ### Literals

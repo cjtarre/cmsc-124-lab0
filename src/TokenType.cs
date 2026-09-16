@@ -29,6 +29,7 @@ public enum TokenType {
     // Arithmetic
     STAR, SLASH, MOD,           
     PLUS, MINUS,
+    EXP,
 
     // Comparison
     EQUAL, GREATER, LESSER,

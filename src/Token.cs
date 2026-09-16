@@ -15,7 +15,9 @@ class Token{
         string literalText = Literal switch {
             null => "null",
             bool b => b.ToString().ToLower(),
-            double d => d.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture),
+            double d => (d % 1 == 0) 
+                ? d.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)
+                : d.ToString("G", System.Globalization.CultureInfo.InvariantCulture),
             _ => Literal.ToString()!
         };
         return $"Token(type={Type}, lexeme={Lexeme}, literal={literalText}, line={Line})";
