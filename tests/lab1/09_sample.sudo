@@ -1,0 +1,2 @@
+INITIALIZE greeting <- "hello"
+PRINT greeting

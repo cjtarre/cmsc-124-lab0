@@ -1,7 +1,0 @@
-IF x < y THEN
-    PRINT x
-ELSE IF x = y
-    PRINT y
-ELSE
-    PRINT 0
-END IF

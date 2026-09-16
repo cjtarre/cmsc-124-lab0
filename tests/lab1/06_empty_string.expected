@@ -1,2 +1,0 @@
-Token(type=STRING, lexeme="", literal=, line=1)
-Token(type=EOF, lexeme=, literal=null, line=1)
