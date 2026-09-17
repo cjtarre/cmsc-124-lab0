@@ -196,9 +196,21 @@ Message format:
 | tests/lab4 | Context | inline | none |
 | tests/lab5 | Functions | inline | none |
 
-```
-Lab 1 tests cover keywords and identifiers, operators, conditional and loop tokens, and lexical error handling.
-```
+### Lab 1 Tests
+| Test | Coverage |
+|---|---|
+| `00_keywords` | All tokens in token registry are readable by the scanner.  |
+| `01_identifier` | Scanner can read variations with variable names. |
+| `02_operators` | Scanner can recognize the correct keyword for each symbol and operator. |
+| `03_strings` | Scanner properly reads strings (treating backslashes as literal text). |
+| `04_numbers` | All numbers are stored with the correct floating value, with ints defaulted to use 1 decimal place. |
+| `05_comments` | Comments ignore all character following its lexeme.  |
+| `06_whitespace` | Validates that spaces, tabs, and newlines do not generate tokens. Newlines only update line numbers. |
+| `07_boundaries` | Reads the correct token based on different character combinations and boundaries (like `<-` vs `<`). |
+| `08_empty` | Shows only `EOF` as the only token. |
+| `09_sample` | Reads a sample code and returns the correct tokens |
+| `err_invalid_char` | Should return nothing, with exit code `65` after detecting an invalid character.  |
+| `err_string` | Should return nothing, with exit code `65` after an unclosed string instance |
 
 Run locally with:
 ```bash
