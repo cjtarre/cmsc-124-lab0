@@ -50,7 +50,7 @@ All keywords in this language are defined and written in uppercase.
 ### Master Token Registry
 ```
 LEFT_PAREN  RIGHT_PAREN
-PLUS  MINUS  STAR  SLASH  MOD
+PLUS  MINUS  STAR  SLASH  MOD EXP
 ASSIGN  EQUAL  NOT_EQUAL  LESSER  LESSER_EQUAL  GREATER  GREATER_EQUAL
 IDENTIFIER  STRING  NUMBER
 INITIALIZE  SET  INPUT  OUTPUT  PRINT
@@ -200,7 +200,7 @@ Message format:
 | Test | Coverage |
 |---|---|
 | `00_keywords` | All tokens in token registry are readable by the scanner.  |
-| `01_identifier` | Scanner can read variations with variable names. |
+| `01_identifiers` | Scanner can read variations with variable names. |
 | `02_operators` | Scanner can recognize the correct keyword for each symbol and operator. |
 | `03_strings` | Scanner properly reads strings (treating backslashes as literal text). |
 | `04_numbers` | All numbers are stored with the correct floating value, with ints defaulted to use 1 decimal place. |
@@ -209,8 +209,10 @@ Message format:
 | `07_boundaries` | Reads the correct token based on different character combinations and boundaries (like `<-` vs `<`). |
 | `08_empty` | Shows only `EOF` as the only token. |
 | `09_sample` | Reads a sample code and returns the correct tokens |
+| `10_escape_sequences` | Verifies that backslashes in strings are treated as literal text. |
 | `err_invalid_char` | Should return nothing, with exit code `65` after detecting an invalid character.  |
 | `err_string` | Should return nothing, with exit code `65` after an unclosed string instance |
+| `err_multiline_string` | Should return nothing, with exit code `65` when a string spans multiple lines. |
 
 Run locally with:
 ```bash
@@ -249,4 +251,4 @@ Our most significant mid-design pivot was removing the dual assignment meaning o
 ## Changelog
 | Activity | What changed in the language |
 |---|---|
-| Lab 1 | Initial language specifications locked; custom operators, tokens, and pseudocode structures defined. |
+| Lab 1 | Lexical specifications defined; scanner implementation and lexical rules for tokens, operators, literals, comments, and whitespace established. |

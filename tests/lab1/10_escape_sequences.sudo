@@ -1,0 +1,2 @@
+INITIALIZE message <- "hello\nworld"
+INITIALIZE tab <- "hello\tworld"
