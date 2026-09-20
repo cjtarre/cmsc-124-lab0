@@ -171,18 +171,16 @@ class Scanner {
     }
 
     private void ScanString() {
-        while (Peek() != '"' && !IsAtEnd()) {
-            if (Peek() == '\n') _line++;
-            Advance();
-        }
-        if (IsAtEnd()) FlagError("Unterminated string.");
+        // Stop at a newline because strings cannot span multiple lines.
+        while (Peek() != '"' && Peek() != '\n' && !IsAtEnd()) { Advance();}
+        if (Peek() == '\n' || IsAtEnd()) { FlagError("Unterminated string."); return;}
 
-        // consume the closing "
-        Advance();
+        Advance(); // consume closing "
+
         string value = _source[(_start + 1) .. (_current - 1)];
         AddToken(TokenType.STRING, value);
     }
-    
+
     private void ScanNumber() {
         while (char.IsDigit(Peek())) Advance();
 
