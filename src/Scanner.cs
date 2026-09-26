@@ -60,18 +60,18 @@ class Scanner {
     public Scanner(string source) => _source = source;
     
     // helper methods
-    public bool IsAtEnd() => _current >= _source.Length;
-    public char Advance() => _source[_current++];
-    public char Peek(int offset = 0) => (IsAtEnd() || _current + offset >= _source.Length) ? '\0' : _source[_current + offset];
+    private bool IsAtEnd() => _current >= _source.Length;
+    private char Advance() => _source[_current++];
+    private char Peek(int offset = 0) => (IsAtEnd() || _current + offset >= _source.Length) ? '\0' : _source[_current + offset];
     
-    public bool Match(char expected) {
+    private bool Match(char expected) {
         if (IsAtEnd()) return false;
         if (_source[_current] != expected) return false;
         _current++;
         return true;
     }
-    public void AddToken(TokenType type, object? literal = null) => _tokens.Add(new Token(type, _source[_start .. _current], literal, _line));
-    public void FlagError(string message) {
+    private void AddToken(TokenType type, object? literal = null) => _tokens.Add(new Token(type, _source[_start .. _current], literal, _line));
+    private void FlagError(string message) {
         errorMessages.Add($"[Line {_line}] Lexical Error: {message}");
     }
     public void PrintTokens(int mode = 0){
@@ -84,15 +84,12 @@ class Scanner {
     
     // core scanner methods
     public void ScanTokens() {
-        while (!IsAtEnd()) {
-            _start = _current;
-            ScanToken();
-        }
+        while (!IsAtEnd()) {_start = _current; ScanToken();}
         _start = _source.Length;
         AddToken(TokenType.EOF);
     }
 
-    public void ScanToken() {
+    private void ScanToken() {
         char c = Advance();
         switch (c) {
             // single character tokens
