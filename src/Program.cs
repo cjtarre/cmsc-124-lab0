@@ -56,12 +56,9 @@ static void REPL() {
     while (true) {
         Console.Write("> ");
         string? line = Console.ReadLine();
-        if (line == null) {
-            break;
-        }
-        Scanner scanner = new Scanner(line);
-        scanner.ScanTokens();
-        scanner.PrintTokens(1);
+        if (line == null) break;
+        Parser? parser = ParseSource(line);
+        parser?.PrintAST();
     }
 }
 
