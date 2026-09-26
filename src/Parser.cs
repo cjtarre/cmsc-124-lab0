@@ -1,6 +1,9 @@
 class Parser {
     // fields and properties
     private readonly IReadOnlyList<Token> _tokens = [];
+    private List<string> errorMessages = [];
+    public bool HasErrors => errorMessages.Count > 0;
+    public IReadOnlyList<string> ErrorMessages => errorMessages;
     public Parser(IReadOnlyList<Token> tokens) => _tokens = tokens;
     private int _current = 0;
     
@@ -26,29 +29,119 @@ class Parser {
         if (Check(type)) return Advance();
         throw Error(Peek(), message);
     }
+    private class ParseErrorException : Exception {
+        public ParseErrorException(string message) : base(message) {}
+    }
+    private ParseErrorException Error(Token token, string message) {
+        errorMessages.Add($"[Line {token.Line}] Parsing Error: {message}");
+        return new ParseErrorException(message);
+    }
+    
+    // core parsing methods
     public void Parse() {
     } 
     private void Synchronize() {
     }
     private Expr Expression() => Assignment();  // entry point for parsing expressions
     private Expr Assignment() {
+        Expr expr = LogicalOr();                // drop down to the highest precedence level first
+        if (Match(TokenType.ASSIGN)) {          // right associative
+            Token op = Previous();              // consume the assignment operator
+            Expr value = Assignment();          // recursively calls itself to parse the right-hand side of the assignment first
+            if (expr is Expr.Variable v) {      // check if the left-hand side is a valid assignment target (a variable)
+                return new Expr.Assignment(v.Name, value);
+            }
+            throw Error(op, "Invalid assignment target.");  // if the left-hand side is not a variable, throw an error
+        }
+        return expr;
     }
     private Expr LogicalOr() {
+        Expr expr = LogicalAnd();
+        while (Match(TokenType.OR, TokenType.XOR)) {    // left associative
+            Token op = Previous();
+            Expr right = LogicalAnd();                  // drop down to the next precedence level to parse the right-hand side of the logical operation
+            expr = new Expr.Binary(expr, op, right);    // build a new binary expression node with the left and right operands and the operator
+        }
+        return expr;
     }
     private Expr LogicalAnd() {
+        Expr expr = LogicalNot();
+        while (Match(TokenType.AND)) {
+            Token op = Previous();
+            Expr right = LogicalNot();
+            expr = new Expr.Binary(expr, op, right);
+        }
+        return expr;
     }
     private Expr LogicalNot() {
+        if (Match(TokenType.NOT)) {
+            Token op = Previous();
+            Expr right = LogicalNot();
+            return new Expr.Unary(op, right);
+        }
+        return Comparison();
     }
     private Expr Comparison() {
+        Expr expr = Term();
+        while (Match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESSER, TokenType.LESSER_EQUAL, TokenType.EQUAL, TokenType.NOT_EQUAL)) {
+            Token op = Previous();
+            Expr right = Term();
+            expr = new Expr.Binary(expr, op, right);
+        }
+        return expr;
     }
     private Expr Term() {
+        Expr expr = Factor();
+        while (Match(TokenType.PLUS, TokenType.MINUS)) {
+            Token op = Previous();
+            Expr right = Factor();
+            expr = new Expr.Binary(expr, op, right);
+        }
+        return expr;
     }
     private Expr Factor() {
+        Expr expr = UnaryMinus();
+        while (Match(TokenType.STAR, TokenType.SLASH, TokenType.MOD)) {
+            Token op = Previous();
+            Expr right = UnaryMinus();
+            expr = new Expr.Binary(expr, op, right);
+        }
+        return expr;
     }
     private Expr UnaryMinus() {
+        if (Match(TokenType.MINUS)) {
+            Token op = Previous();
+            Expr right = UnaryMinus();
+            return new Expr.Unary(op, right);
+        }
+        return Power();
     }
     private Expr Power() {
+        Expr expr = Primary();
+        if (Match(TokenType.EXP)) {
+            Token op = Previous();
+            Expr right = Power(); 
+            expr = new Expr.Binary(expr, op, right);
+        }
+        return expr;
     }
+
+    // evaluates the atomic items in the grammar (literals, identifiers, and parenthesized expressions)
     private Expr Primary() {
+        if (Match(TokenType.FALSE))     return new Expr.Literal(false);
+        if (Match(TokenType.TRUE))      return new Expr.Literal(true);
+        if (Match(TokenType.NIL))       return new Expr.Literal(null);
+        if (Match(TokenType.NUMBER, TokenType.STRING)) {
+            return new Expr.Literal(Previous().Literal);
+        }
+        if (Match(TokenType.IDENTIFIER)) {
+            return new Expr.Variable(Previous());
+        }
+        if (Match(TokenType.LEFT_PAREN)) {
+            Expr expr = Expression();
+            Consume(TokenType.RIGHT_PAREN, "Expected ')' after expression.");
+            return new Expr.Grouping(expr);
+        }
+        throw Error(Peek(), "Expected expression.");
     }
 }
