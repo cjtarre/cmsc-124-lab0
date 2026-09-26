@@ -28,11 +28,27 @@ static Scanner? ScanSource(string source) {
         return null;
     }
 }
-
 static Scanner? Scan(string path) {
     string? source = LoadSource(path);
     if (source == null) return null;
     return ScanSource(source);
+}
+static Parser? ParseSource(string source) {
+    Scanner? scanner = ScanSource(source);
+    if (scanner == null) return null;
+    try {
+        Parser parser = new Parser(scanner.Tokens);
+        parser.Parse();
+        return parser;
+    } catch (Exception error) {
+        Fail($"error while parsing: {error.Message}");
+        return null;
+    }
+}
+static Parser? Parse(string path) {
+    string? source = LoadSource(path);
+    if (source == null) return null;
+    return ParseSource(source);
 }
 
 static void REPL() {
@@ -62,7 +78,12 @@ switch (args[0]) {
         Scanner? scanner = Scan(path);
         scanner?.PrintTokens();
         break;
-
+    case "--parse":
+        if (args.Length != 2) Fail("expected --parse <source-file>");
+        path = args[1];
+        Parser? parser = Parse(path);
+        parser?.PrintAST();
+        break;
     case "--version":
         Console.WriteLine("SudoCode 0.1.0");
         break;
