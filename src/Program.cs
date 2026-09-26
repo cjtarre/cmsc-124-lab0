@@ -36,6 +36,10 @@ static Scanner? Scan(string path) {
 static Parser? ParseSource(string source) {
     Scanner? scanner = ScanSource(source);
     if (scanner == null) return null;
+    if (scanner.HasErrors) {
+        foreach (string error in scanner.ErrorMessages) Console.Error.WriteLine(error);
+        return null;
+    }
     try {
         Parser parser = new Parser(scanner.Tokens);
         parser.Parse();
@@ -58,7 +62,7 @@ static void REPL() {
         string? line = Console.ReadLine();
         if (line == null) break;
         Parser? parser = ParseSource(line);
-        parser?.PrintAST();
+        parser?.PrintAST(1);
     }
 }
 
@@ -79,6 +83,7 @@ switch (args[0]) {
         if (args.Length != 2) Fail("expected --parse <source-file>");
         path = args[1];
         Parser? parser = Parse(path);
+        if (parser == null) Environment.Exit(65);
         parser?.PrintAST();
         break;
     case "--version":
