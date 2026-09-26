@@ -48,6 +48,9 @@ class Scanner {
         ["MOD"] = TokenType.MOD
         };
     private List<string> errorMessages = [];
+    public IReadOnlyList<Token> Tokens => _tokens;
+    public IReadOnlyList<string> ErrorMessages => errorMessages;
+    public bool HasErrors => errorMessages.Count > 0;
 
     // marker references
     private int _current = 0;
@@ -72,15 +75,11 @@ class Scanner {
         errorMessages.Add($"[Line {_line}] Lexical Error: {message}");
     }
     public void PrintTokens(int mode = 0){
-        if (errorMessages.Count > 0) {
-            foreach (string error in errorMessages) {
-                Console.Error.WriteLine(error);
-            }
+        if (HasErrors) {
+            foreach (string error in errorMessages) Console.Error.WriteLine(error);
             if (mode == 0) Environment.Exit(65);
         }
-        foreach (Token token in _tokens) {
-            Console.WriteLine(token);
-        }
+        foreach (Token token in _tokens) Console.WriteLine(token);
     }
     
     // core scanner methods

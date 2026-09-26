@@ -7,16 +7,28 @@ static void Fail(string message){
     Environment.Exit(65);
 }
 
-static void LoadFile(string path) {
+static string? LoadSource(string path) {
     try {
-        string content = File.ReadAllText(path, Encoding.UTF8);
-        Scanner scanner = new Scanner(content);
-        scanner.ScanTokens();
-        scanner.PrintTokens();
+        return File.ReadAllText(path, Encoding.UTF8);
     } catch (Exception error) when (error is IOException or UnauthorizedAccessException) {
         Fail($"cannot read '{path}': {error.Message}");
     } catch (Exception error) {
+        Fail($"error while reading '{path}': {error.Message}");
+    }
+    return null;
+}
+
+static Scanner? Scan(string path) {
+    string? source = LoadSource(path);
+    if (source == null) return null;
+
+    try {
+        Scanner scanner = new Scanner(source);
+        scanner.ScanTokens();
+        return scanner;
+    } catch (Exception error) {
         Fail($"error while scanning '{path}': {error.Message}");
+        return null;
     }
 }
 
@@ -37,6 +49,7 @@ static void REPL() {
 // Main program entry point
 if (args.Length == 0) {
     REPL();
+    return 0;
 }
 string path;
 switch (args[0]) {
@@ -44,8 +57,10 @@ switch (args[0]) {
         if (args.Length != 2) {
             Fail("expected --tokenize <source-file>");
         }
+        if (args.Length != 2) Fail("expected --tokenize <source-file>");
         path = args[1];
-        LoadFile(path);
+        Scanner? scanner = Scan(path);
+        scanner?.PrintTokens();
         break;
 
     case "--version":
