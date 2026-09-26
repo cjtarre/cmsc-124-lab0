@@ -56,6 +56,16 @@ class Parser {
             Advance();
         }
     }
+    public void PrintAST(int mode = 0){
+        if (HasErrors) {
+            foreach (string error in errorMessages) Console.Error.WriteLine(error);
+            if (mode == 0) Environment.Exit(65);
+            return;
+        }
+        foreach (Expr expr in _expr) Console.WriteLine(Expr.Print(expr));
+    }
+
+    // grammar rules (operations ordered by precedence from lowest to highest)
     private Expr Expression() => Assignment();  // entry point for parsing expressions
     private Expr Assignment() {
         Expr expr = LogicalOr();                // drop down to the highest precedence level first
