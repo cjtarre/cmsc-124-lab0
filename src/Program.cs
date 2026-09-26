@@ -20,7 +20,7 @@ static void LoadFile(string path) {
     }
 }
 
-static int REPL() {
+static void REPL() {
     Console.WriteLine("SudoCode REPL 0.1.0 (Press Ctrl+C to exit)");
     while (true) {
         Console.Write("> ");
@@ -32,12 +32,11 @@ static int REPL() {
         scanner.ScanTokens();
         scanner.PrintTokens(1);
     }
-    return 0;
 }
 
 // Main program entry point
 if (args.Length == 0) {
-    return REPL();
+    REPL();
 }
 string path;
 switch (args[0]) {
