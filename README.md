@@ -124,11 +124,51 @@ Token(type=EOF, lexeme=, literal=null, line=1)
 - `line`: The tracker value pointing to the line number the token was detected on.
 
 ## Grammar
-*To be defined in a later lab activity.*
+```
+expression      → assignment
+assignment      → logicalOr ( "<-" assignment )?
+logicalOr       → logicalAnd ( ( "OR" | "XOR" ) logicalAnd )*
+logicalAnd      → logicalNot ( "AND" logicalNot )*
+logicalNot      → "NOT" logicalNot | comparison
+comparison      → term ( ( ">" | ">=" | "<" | "<=" | "=" | "!=" ) term )*
+term            → factor ( ( "-" | "+" ) factor )*
+factor          → unary ( ( "" | "/" | "%" | "MOD" ) unary )
+unary           → "-" unary | power
+power           → primary ( "^" power )?
+primary         → NUMBER | STRING | "TRUE" | "FALSE" | "NIL" | 
+                  IDENTIFIER | "(" expression ")"
+```
+Notes on deviations from the textbook grammar:
+- `assignment` is right-associative and checked structurally rather than by looking ahead for `IDENTIFIER "<-"`: the parser parses the left side as a full `logicalOr` expression first, then verifies at runtime that the result is a valid assignment target (an `Expr.Variable`). An invalid target (e.g. `1 + 1 <- 5`) is a parse error, not a scan error.
+- `^` (exponentiation) is right-associative, matching mathematical convention (`2^3^2` parses as `2^(3^2)`, not `(2^3)^2`).
+- Unary `-` sits between `factor` and `power`, binding tighter than `*`/`/` but looser than `^`. This means `-2^2` parses as `-(2^2) = -4`, matching the reading Python and standard mathematical notation use, rather than `(-2)^2 = 4`.
+- `NOT` sits above `comparison` (looser), not down near `factor`/`term`, so that `NOT a = b` parses as `NOT (a = b)` rather than `(NOT a) = b`.
+- This grammar covers expressions only. Keywords governing control flow, declarations, and I/O (`IF`, `FOR`, `WHILE`, `INITIALIZE`, `SET`, `PRINT`, etc.) are not part of any expression production and are reserved for a later statement grammar; a bare keyword like `IF` cannot begin an `expression` and is rejected as a syntax error under this lab's scope.
 
 ## Parse output format
-*To be defined in a later lab activity.*
+`--parse` prints one line per top-level expression parsed from the file, in prefix parenthesized form: the operator (or a fixed keyword) comes first, followed by its operands, all wrapped in parentheses.
+```
+Token(type=NUMBER, ...) + Token(type=NUMBER, ...) → (+ 1.0 1.0)
 
+X <- 17 → (assign X 17.0)
+
+(1 + 2) * 3 → (* (group (+ 1.0 2.0)) 3.0)
+
+NOT 3 → (NOT 3)
+```
+- Binary expressions print as `(OPERATOR LEFT RIGHT)`, using the operator's lexeme (e.g. `+`, `-`, `=`, `AND`).
+- Unary expressions print as `(OPERATOR OPERAND)`.
+- Grouped expressions print as `(group INNER)` — the parentheses themselves are not part of the tree, so the printer reinserts a `group` marker to make the grouping visible in output.
+- Assignments print as `(assign NAME VALUE)`.
+- Variables print as their identifier name (bare, no wrapping).
+- Numbers print using the same convention as token output: 
+  - an integral double prints with one decimal place (`5` → `5.0`); 
+  - a fractional double prints its natural decimal form (`5.25` → `5.25`).
+- Booleans print as lowercase `true` / `false`.
+- `NIL` prints as `nil`.
+- File-splitting rule: ....
+- Rejections: a file containing a syntax error prints nothing to stdout, reports one ```  [Line N] Parsing Error: ...  ``` message per line to stderr, and exits with code `65`. The parser attempts to recover after each error (via synchronization to the next line) so multiple errors in one file can be reported in a single run.
+  
 ## Semantics
 *To be defined in a later lab activity.*
 
@@ -214,6 +254,12 @@ Message format:
 | `err_invalid_char` | Should return nothing, with exit code `65` after detecting an invalid character.  |
 | `err_string` | Should return nothing, with exit code `65` after an unclosed string instance |
 | `err_multiline_string` | Should return nothing, with exit code `65` when a string spans multiple lines. |
+
+### Lab 2 Tests
+| Test | Coverage |
+|---|---|
+| `00_` | placeholder  |
+
 
 Run locally with:
 ```bash
