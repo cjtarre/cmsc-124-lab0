@@ -18,18 +18,21 @@ static string? LoadSource(string path) {
     return null;
 }
 
-static Scanner? Scan(string path) {
-    string? source = LoadSource(path);
-    if (source == null) return null;
-
+static Scanner? ScanSource(string source) {
     try {
         Scanner scanner = new Scanner(source);
         scanner.ScanTokens();
         return scanner;
     } catch (Exception error) {
-        Fail($"error while scanning '{path}': {error.Message}");
+        Fail($"error while scanning: {error.Message}");
         return null;
     }
+}
+
+static Scanner? Scan(string path) {
+    string? source = LoadSource(path);
+    if (source == null) return null;
+    return ScanSource(source);
 }
 
 static void REPL() {
