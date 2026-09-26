@@ -101,12 +101,16 @@ class Scanner {
             case '=': AddToken(TokenType.EQUAL); break;
             case '+': AddToken(TokenType.PLUS); break;
             case '-': AddToken(TokenType.MINUS); break;
-            case '*': AddToken(TokenType.STAR); break;
             case '/': AddToken(TokenType.SLASH); break;
             case '%': AddToken(TokenType.MOD); break;
             case '^': AddToken(TokenType.EXP); break;
 
             // tokens that can be more than one character
+            case '*': 
+                if (Match('*') )        AddToken(TokenType.EXP);
+                else                    AddToken(TokenType.STAR);
+                break;
+                
             case '<':
                 if (Match('='))         AddToken(TokenType.LESSER_EQUAL);
                 else if (Match('-'))    AddToken(TokenType.ASSIGN);

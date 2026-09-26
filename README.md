@@ -64,8 +64,9 @@ EOF
 ### Operators
 | Operator | Category | Operands | Associativity | Precedence |
 |---|---|---|---|---|
-| `(`, `)` | grouping | binary | right | 8 (*tightest*) |
-| `^` | arithmetic | binary | right | 7 |
+| `(`, `)` | grouping | binary | right | 9 (*tightest*) |
+| `^`, `**` | arithmetic | binary | right | 8 |
+| `-` (unary) | arithmetic | unary | right | 7 |
 | `*`, `/`, `%`, `MOD` | arithmetic | binary | left | 6 |
 | `+`, `-` | arithmetic | binary | left | 5 |
 | `=`, `>`, `>=`, `<`, `<=`, `!=` | comparison | binary | left | 4 |
