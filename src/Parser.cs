@@ -1,8 +1,10 @@
 class Parser {
     // fields and properties
+    private readonly List<Expr> _expr = [];
     private readonly IReadOnlyList<Token> _tokens = [];
     private List<string> errorMessages = [];
     public bool HasErrors => errorMessages.Count > 0;
+    public IReadOnlyList<Expr> Expressions => _expr;
     public IReadOnlyList<string> ErrorMessages => errorMessages;
     public Parser(IReadOnlyList<Token> tokens) => _tokens = tokens;
     private int _current = 0;
@@ -39,8 +41,20 @@ class Parser {
     
     // core parsing methods
     public void Parse() {
+        while (!IsAtEnd()) {
+            try { _expr.Add(Expression()); } 
+        catch (ParseErrorException error) {
+            errorMessages.Add($"[Line {Peek().Line}] Parsing Error: {error.Message}");
+            Synchronize();          // attempt to salvage the parser state and continue parsing
+            }
+        }
     } 
     private void Synchronize() {
+        Advance();                  // consume the erroneous token
+        while (!IsAtEnd()) {        // keep advancing until we find a statement boundary (by line for now)
+            if (Previous().Line != Peek().Line) return;
+            Advance();
+        }
     }
     private Expr Expression() => Assignment();  // entry point for parsing expressions
     private Expr Assignment() {
