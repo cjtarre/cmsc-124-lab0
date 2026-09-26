@@ -54,9 +54,6 @@ if (args.Length == 0) {
 string path;
 switch (args[0]) {
     case "--tokenize":
-        if (args.Length != 2) {
-            Fail("expected --tokenize <source-file>");
-        }
         if (args.Length != 2) Fail("expected --tokenize <source-file>");
         path = args[1];
         Scanner? scanner = Scan(path);
