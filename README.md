@@ -273,7 +273,7 @@ Message format:
 | `err_missing_operand` | Rejects a binary operator with a missing right-hand operand. |
 | `err_multiple_expressions` | Rejects multiple top-level expressions on the same physical line. |
 | `err_unclosed_group` | Rejects a parenthesized expression missing its closing `)`. |
-
+| `err_multiline_group` | Rejects a grouped expression whose closing parenthesis appears on a different physical line. |
 
 Run locally with:
 ```bash
