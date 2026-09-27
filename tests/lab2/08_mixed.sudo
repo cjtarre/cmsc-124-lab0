@@ -1,0 +1,1 @@
+result <- 1 + 2 * 3 ^ 4 < 100 AND NOT FALSE OR TRUE
