@@ -8,9 +8,15 @@ class Parser {
     public IReadOnlyList<string> ErrorMessages => errorMessages;
     public Parser(IReadOnlyList<Token> tokens) => _tokens = tokens;
     private int _current = 0;
+    private int? _expressionLine = null;
     
     // helper methods
     private bool Match (params TokenType[] types) { // checks and advances if true
+        // do not consume tokens belonging to the next expression
+        if (_expressionLine != null && Peek().Line != _expressionLine) {
+            return false;
+        }
+
         foreach (TokenType type in types) {
             if (Check(type)) {
                 Advance();
@@ -42,13 +48,23 @@ class Parser {
     // core parsing methods
     public void Parse() {
         while (!IsAtEnd()) {
-            try { _expr.Add(Expression()); } 
-        catch (ParseErrorException error) {
-            errorMessages.Add($"[Line {Peek().Line}] Parsing Error: {error.Message}");
-            Synchronize();          // attempt to salvage the parser state and continue parsing
+            try {
+                _expressionLine = Peek().Line;
+                _expr.Add(Expression());
+
+                // only one expression is allowed per line
+                if (!IsAtEnd() && Peek().Line == _expressionLine) {
+                    throw Error(Peek(), "Expected end of expression.");
+                }
+            }
+            catch (ParseErrorException) {
+                Synchronize();          // attempt to recover at the next line
+            }
+            finally {
+                _expressionLine = null;
             }
         }
-    } 
+    }
     private void Synchronize() {
         Advance();                  // consume the erroneous token
         while (!IsAtEnd()) {        // keep advancing until we find a statement boundary (by line for now)
