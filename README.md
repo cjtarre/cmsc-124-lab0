@@ -102,7 +102,7 @@ EOF
 
 ## Whitespace and termination
 - Whitespace significant: **No**. Whitespace acts as a delimiter to distinguish individual words and symbols but does not dictate program structural grouping or indent validation.
-- Statement terminator: **None**. Code steps are separated implicitly by statement block sequences and structural boundary wrappers. Newlines are treated as standard whitespace but are tracked for token line numbers.
+- Statement terminator: **None**. During tokenization, newlines are treated as whitespace and are tracked through token line numbers. During expression parsing, each physical line may contain at most one top-level expression, so a newline acts as the boundary between top-level expressions.
 - Block delimiters: **Marked explicitly** by corresponding keyword bounds <br>(e.g., `IF` ... `THEN` ... `END IF` or `WHILE` ... `DO` ... `END WHILE`).
 - Grouping delimiters: Standard parentheses `(` and `)` are used to force expression precedence and enclose function/procedure parameters.
 - Token separators: 
@@ -132,15 +132,15 @@ logicalAnd      → logicalNot ( "AND" logicalNot )*
 logicalNot      → "NOT" logicalNot | comparison
 comparison      → term ( ( ">" | ">=" | "<" | "<=" | "=" | "!=" ) term )*
 term            → factor ( ( "-" | "+" ) factor )*
-factor          → unary ( ( "" | "/" | "%" | "MOD" ) unary )
+factor          → unary ( ( "*" | "/" | "%" | "MOD" ) unary )*
 unary           → "-" unary | power
-power           → primary ( "^" power )?
+power           → primary ( ( "^" | "**" ) power )?
 primary         → NUMBER | STRING | "TRUE" | "FALSE" | "NIL" | 
                   IDENTIFIER | "(" expression ")"
 ```
 Notes on deviations from the textbook grammar:
 - `assignment` is right-associative and checked structurally rather than by looking ahead for `IDENTIFIER "<-"`: the parser parses the left side as a full `logicalOr` expression first, then verifies at runtime that the result is a valid assignment target (an `Expr.Variable`). An invalid target (e.g. `1 + 1 <- 5`) is a parse error, not a scan error.
-- `^` (exponentiation) is right-associative, matching mathematical convention (`2^3^2` parses as `2^(3^2)`, not `(2^3)^2`).
+- `^` and `**` (exponentiation) are right-associative, matching mathematical convention (`2^3^2` parses as `2^(3^2)`, not `(2^3)^2`).
 - Unary `-` sits between `factor` and `power`, binding tighter than `*`/`/` but looser than `^`. This means `-2^2` parses as `-(2^2) = -4`, matching the reading Python and standard mathematical notation use, rather than `(-2)^2 = 4`.
 - `NOT` sits above `comparison` (looser), not down near `factor`/`term`, so that `NOT a = b` parses as `NOT (a = b)` rather than `(NOT a) = b`.
 - This grammar covers expressions only. Keywords governing control flow, declarations, and I/O (`IF`, `FOR`, `WHILE`, `INITIALIZE`, `SET`, `PRINT`, etc.) are not part of any expression production and are reserved for a later statement grammar; a bare keyword like `IF` cannot begin an `expression` and is rejected as a syntax error under this lab's scope.
@@ -154,7 +154,7 @@ X <- 17 → (assign X 17.0)
 
 (1 + 2) * 3 → (* (group (+ 1.0 2.0)) 3.0)
 
-NOT 3 → (NOT 3)
+NOT 3 → (NOT 3.0)
 ```
 - Binary expressions print as `(OPERATOR LEFT RIGHT)`, using the operator's lexeme (e.g. `+`, `-`, `=`, `AND`).
 - Unary expressions print as `(OPERATOR OPERAND)`.
@@ -166,8 +166,8 @@ NOT 3 → (NOT 3)
   - a fractional double prints its natural decimal form (`5.25` → `5.25`).
 - Booleans print as lowercase `true` / `false`.
 - `NIL` prints as `nil`.
-- File-splitting rule: ....
-- Rejections: a file containing a syntax error prints nothing to stdout, reports one ```  [Line N] Parsing Error: ...  ``` message per line to stderr, and exits with code `65`. The parser attempts to recover after each error (via synchronization to the next line) so multiple errors in one file can be reported in a single run.
+- File-splitting rule: Each physical line contains at most one top-level expression. A newline terminates the current top-level expression, and `--parse` prints one AST line for each valid expression. Multiple expressions on the same physical line are rejected as a syntax error.
+- Rejections: a file containing a syntax error prints nothing to stdout, reports `[Line N] Parsing Error: ...` diagnostics to stderr, and exits with code `65`. The parser attempts to recover after each error by synchronizing to the next line so multiple errors in one file can be reported in a single run.
   
 ## Semantics
 *To be defined in a later lab activity.*
@@ -258,7 +258,21 @@ Message format:
 ### Lab 2 Tests
 | Test | Coverage |
 |---|---|
-| `00_` | placeholder  |
+| `00_literals` | Covers number, string, Boolean, and `NIL` literal expressions. |
+| `01_precedence` | Verifies operator precedence across arithmetic, comparison, and logical levels. |
+| `02_associativity` | Verifies left-associative subtraction/division and right-associative exponentiation/assignment. |
+| `03_grouping` | Verifies grouping expressions, including nested and redundant parentheses. |
+| `04_unary` | Covers unary minus, chained unary operators, `NOT`, and unary/exponent precedence. |
+| `05_line_boundaries` | Verifies that each physical line is parsed as a separate top-level expression. |
+| `06_logical` | Covers comparison, `NOT`, `AND`, `OR`, and `XOR` expressions and their precedence. |
+| `07_assignment` | Covers variables, simple assignment, assignment precedence, and chained right-associative assignment. |
+| `08_mixed` | Verifies a mixed expression spanning multiple precedence levels. |
+| `err_invalid_char` | Rejects input containing a lexical error during parsing. |
+| `err_invalid_assignment` | Rejects an assignment whose left-hand side is not a variable. |
+| `err_invalid_expression` | Rejects a token that cannot begin an expression. |
+| `err_missing_operand` | Rejects a binary operator with a missing right-hand operand. |
+| `err_multiple_expressions` | Rejects multiple top-level expressions on the same physical line. |
+| `err_unclosed_group` | Rejects a parenthesized expression missing its closing `)`. |
 
 
 Run locally with:
