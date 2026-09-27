@@ -34,6 +34,10 @@ class Parser {
         return Previous();
     }
     private Token Consume(TokenType type, string message) {
+        if (_expressionLine != null && Peek().Line != _expressionLine) {
+            throw Error(Peek(), message);
+        }
+
         if (Check(type)) return Advance();
         throw Error(Peek(), message);
     }
