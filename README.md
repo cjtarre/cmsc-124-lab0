@@ -127,9 +127,9 @@ Token(type=EOF, lexeme=, literal=null, line=1)
 ```
 expression      → assignment
 assignment      → logicalOr ( "<-" assignment )?
-logicalOr       → logicalAnd ( ( "OR" | "XOR" ) logicalAnd )*
-logicalAnd      → logicalNot ( "AND" logicalNot )*
-logicalNot      → "NOT" logicalNot | comparison
+logicalOr       → logicalAnd ( ( "OR" | "||" | "XOR" ) logicalAnd )*
+logicalAnd      → logicalNot ( ( "AND" | "&&" ) logicalNot )*
+logicalNot      → ( "NOT" | "!" ) logicalNot | comparison
 comparison      → term ( ( ">" | ">=" | "<" | "<=" | "=" | "!=" ) term )*
 term            → factor ( ( "-" | "+" ) factor )*
 factor          → unary ( ( "*" | "/" | "%" | "MOD" ) unary )*
@@ -258,15 +258,17 @@ Message format:
 ### Lab 2 Tests
 | Test | Coverage |
 |---|---|
-| `00_literals` | Covers number, string, Boolean, and `NIL` literal expressions. |
-| `01_precedence` | Verifies operator precedence across arithmetic, comparison, and logical levels. |
-| `02_associativity` | Verifies left-associative subtraction/division and right-associative exponentiation/assignment. |
-| `03_grouping` | Verifies grouping expressions, including nested and redundant parentheses. |
-| `04_unary` | Covers unary minus, chained unary operators, `NOT`, and unary/exponent precedence. |
+| `00_literals` | Covers integer and fractional numbers, strings (including empty strings), Boolean values, and `NIL`. |
+| `01_precedence` | Verifies precedence across arithmetic, exponentiation, comparison, and logical levels, including alternate operator forms. |
+| `02_associativity` | Verifies left associativity for subtraction, division, `%`, and `MOD`, and right associativity for exponentiation and assignment. |
+| `03_grouping` | Verifies grouping expressions, including nested/redundant parentheses and grouping that changes expression structure. |
+| `04_unary` | Covers unary minus, `NOT`/`!`, chained unary operators, and unary/exponentiation precedence. |
 | `05_line_boundaries` | Verifies that each physical line is parsed as a separate top-level expression. |
 | `06_logical` | Covers comparison, `NOT`, `AND`, `OR`, and `XOR` expressions and their precedence. |
 | `07_assignment` | Covers variables, simple assignment, assignment precedence, and chained right-associative assignment. |
 | `08_mixed` | Verifies a mixed expression spanning multiple precedence levels. |
+| `09_empty` | Verifies that an empty source file produces no AST output and exits successfully. |
+| `10_comment_only` | Verifies that a comment-only source file produces no AST output and exits successfully. |
 | `err_invalid_char` | Rejects input containing a lexical error during parsing. |
 | `err_invalid_assignment` | Rejects an assignment whose left-hand side is not a variable. |
 | `err_invalid_expression` | Rejects a token that cannot begin an expression. |
@@ -279,7 +281,9 @@ Run locally with:
 ```bash
 curl -sSL https://raw.githubusercontent.com/WhiteLicorice/cmsc-124-harness/v1.1/run_tests.py -o run_tests.py
 ./build.sh
+python3 run_tests.py tests/lab0
 python3 run_tests.py tests/lab1
+python3 run_tests.py tests/lab2
 ```
 
 ## Sample code
@@ -313,3 +317,4 @@ Our most significant mid-design pivot was removing the dual assignment meaning o
 | Activity | What changed in the language |
 |---|---|
 | Lab 1 | Lexical specifications defined; scanner implementation and lexical rules for tokens, operators, literals, comments, and whitespace established. |
+| Lab 2 | Expression grammar defined; parser, AST representation and printer, operator precedence and associativity, assignment and logical expressions, and syntax error handling established. |
