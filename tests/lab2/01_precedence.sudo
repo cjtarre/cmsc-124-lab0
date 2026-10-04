@@ -1,6 +1,14 @@
 1 + 2 * 3
 1 * 2 + 3
 1 + 2 * 3 ^ 4
+1 + 2 * 3 ** 4
 2 ^ 3 * 4 + 5
+10 % 3 + 2
+10 MOD 3 + 2
 1 < 2 + 3 * 4
+NOT 1 = 2
+!1 = 2
+TRUE AND FALSE
+TRUE && FALSE
 TRUE OR FALSE AND TRUE
+TRUE || FALSE && TRUE

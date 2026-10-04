@@ -3,5 +3,7 @@
 ---5
 NOT TRUE
 NOT NOT FALSE
+!TRUE
+!!FALSE
 -2 ^ 2
 (-2) ^ 2
