@@ -1,0 +1,6 @@
+{
+  "ext": ".sudo",
+  "flag": "--tokenize",
+  "comment_prefix": ">>",
+  "mode": "sidecar"
+}

@@ -1,0 +1,3 @@
+Token(type=IDENTIFIER, lexeme=not_comment, literal=null, line=1)
+Token(type=IDENTIFIER, lexeme=comment, literal=null, line=3)
+Token(type=EOF, lexeme=, literal=null, line=3)

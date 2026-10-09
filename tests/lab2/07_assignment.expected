@@ -1,0 +1,6 @@
+x
+(assign x 5.0)
+(assign result (+ 1.0 (* 2.0 3.0)))
+(assign a (assign b 5.0))
+(assign x (+ y (^ 2.0 3.0)))
+(assign flag (NOT (= 1.0 2.0)))

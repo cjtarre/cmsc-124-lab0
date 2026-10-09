@@ -1,0 +1,5 @@
+{
+  "ext": ".sudo",
+  "flag": "--parse",
+  "mode": "sidecar"
+}
